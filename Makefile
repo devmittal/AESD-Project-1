@@ -1,3 +1,6 @@
+vpath %.c src
+vpath %.h inc
+
 all: 	i2c.c
 	arm-linux-gcc -pthread i2c.c -o i2c_program -lrt
 
