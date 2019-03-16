@@ -1,3 +1,14 @@
+/*****************************************************************************
+​ ​* ​ ​ @file​ ​  		temperature.c
+​ * ​ ​ @brief​ ​ 		Contains function definations to communicate with
+ *					temperature sensor TMP102.
+ *	 @Comm Type 	I2C
+ *   @Tools_Used 	ARM-LINUX-GCC
+​ * ​ ​ @Author(s)​  	​​Souvik De, Devansh Mittal
+​ * ​ ​ @Date​ ​​ 		March 16th, 2019
+​ * ​ ​ @version​ ​ 		1.0
+*****************************************************************************/
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
@@ -8,7 +19,7 @@
 #include <linux/i2c-dev.h>
 #include "..inc/temperature.h"
 
-int temperature(void)
+int init_temperature(void)
 {
 	char *FD_I2C = "/dev/i2c-2";
 	int FD;
