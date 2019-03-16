@@ -12,6 +12,15 @@
 #ifndef TEMPERATURE_H
 #define TEMPERATURE_H
 
+#include <stdio.h>
+#include <fcntl.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <stdint.h>
+#include <sys/ioctl.h>
+#include <linux/i2c-dev.h>
+
 #define TMP102_DEV_ID	(0x48)
 
 int init_temperature(void);
