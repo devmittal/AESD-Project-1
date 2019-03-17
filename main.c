@@ -33,13 +33,13 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	if(pthread_create(&threads[i],  (void *)0, logger, (void *)filename)) // parameters to pass in
+	if(pthread_create(&threads[3],  (void *)0, logger, (void *)filename)) // parameters to pass in
 	{
 		perror("\nError! Could not create logger thread: ");
 		exit(1);
 	}
 
-	for(i=0;i<3;i++)
+	for(i=0;i<4;i++)
 		pthread_join(threads[i],NULL);
 
 	return 0;
