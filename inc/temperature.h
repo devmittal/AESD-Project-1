@@ -22,8 +22,13 @@
 #include <linux/i2c-dev.h>
 
 #define TMP102_DEV_ID	(0x48)
+#define SCALING_FACTOR	(0.0625)
+
+enum Registor_Address{TEMPERATURE_REG, CONFIGURATION_REG, TLOW_REG, THIGH_REG};
 
 int init_temperature(void);
-float read_temperature(int fd, int type);
+float read_temperature(int fd);
+uint8_t write_PointerRegister(int fd, uint8_t register_type);
+uint8_t* read_PointedRegister(int fd);
 
 #endif
