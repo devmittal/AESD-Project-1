@@ -1,3 +1,12 @@
+/*****************************************************************************
+​ ​* ​ ​ @file​ ​  		logger.c
+​ * ​ ​ @brief​ ​ 		Logger thread to log entries received in queue to a log file
+ *   @Tools_Used 	ARM-LINUX-GCC
+​ * ​ ​ @Author(s)​  	​​Souvik De, Devansh Mittal
+​ * ​ ​ @Date​ ​​ 		March 16th, 2019
+​ * ​ ​ @version​ ​ 		1.0
+*****************************************************************************/
+
 #include"../inc/logger.h"
 
 int main(void)
@@ -16,6 +25,9 @@ int main(void)
 	}	
 
 	fprintf(FP,"Project Log File");
+	gettimeofday(&timestamp,NULL);
+	fprintf(FP,"\n\n[%lu seconds %lu microseconds] BIST: Logger thread has started and is running", timestamp.tv_sec,
+			 timestamp.tv_usec);
 	fflush(FP);
 
 	loggerFD = mq_open(QNAME, O_RDONLY | O_CREAT, 0666, NULL);
@@ -36,12 +48,12 @@ int main(void)
 
 		if(message.id == 1)
 		{
-			if(message.isFailure == 1)
+			if(message.status == 1)
 				printf("\n Temperature Sensor Failed");
 			else
 			{					
 				gettimeofday(&timestamp,NULL);
-				fprintf(FP,"\n\n[%lu seconds %lu microseconds] Logger Source ID: \"%s\" | %f C | %f F | %f K",
+				fprintf(FP,"\n\n[%lu seconds %lu microseconds] Logger Source ID: %s | %f C | %f F | %f K",
 						 timestamp.tv_sec, timestamp.tv_usec, message.msg, message.tempC, message.tempF, message.tempK);
 				fflush(FP);
 			}
