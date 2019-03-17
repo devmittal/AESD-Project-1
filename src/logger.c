@@ -48,5 +48,17 @@ int main(void)
 		}
 	}
 
+	if(mq_close(loggerFD) == -1)
+	{
+		perror("Closing file failed: ");
+		exit(0);
+	}
+
+	if(mq_unlink(QNAME) == -1)
+	{
+		perror("Unlinking file failed: ");
+		exit(0);	
+	}
+
 	return 0;
 }
