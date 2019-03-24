@@ -1,11 +1,11 @@
 /*****************************************************************************
-​ ​* ​ ​@File​ ​  		message.c
- * @Brief			Contains function definitions for message.h.
+​ ​* @File​ ​  		message.c
+ * @Brief		Contains function definitions for message.h.
  * @Comm Type 		I2C
- *  @Tools_Used 	ARM-LINUX-GCC
-​ * ​ ​@Author(s)​  	​​Souvik De, Devansh Mittal
-​ * ​ ​@Date​ ​​ 			March 24th, 2019
-​ * ​ ​@version​ ​ 		1.0
+ * @Tools_Used 	ARM-LINUX-GCC
+​ * @Author(s)​  	​​Souvik De, Devansh Mittal
+​ * @Date​ ​​ 		March 24th, 2019
+​ * @version​ ​ 		1.0
 *****************************************************************************/
 
 #include "../inc/message.h"
