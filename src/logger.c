@@ -1,14 +1,55 @@
 /*****************************************************************************
 ​ ​* ​ ​ @file​ ​  		logger.c
-​ * ​ ​ @brief​ ​ 		Logger thread to log entries received in queue to a log file
+​ * ​ ​ @brief​ ​ 		Function definitions for logger.h.
  *   @Tools_Used 	ARM-LINUX-GCC
 ​ * ​ ​ @Author(s)​  	​​Souvik De, Devansh Mittal
 ​ * ​ ​ @Date​ ​​ 		March 16th, 2019
-​ * ​ ​ @version​ ​ 		1.0
+ *   @Modified		March 24th, 2019
+​ * ​ ​ @version​ ​ 		1.1
 *****************************************************************************/
 
 #include"../inc/logger.h"
 
+int write_log(int IsFileCreated, char * LogFilePath, mesg_t *message)
+{
+	int value = 0;
+	mesg_t message;
+
+	value = recv_Message(LOGGR_QNAME, LOGGR_QSIZE, &message);
+	if(value == -1)
+	{
+		return -1;
+	}
+
+	struct timeval Now;
+
+	if(!IsFileCreated)
+	{
+		log_file_ptr = fopen(LogFilePath,"w");
+		if(log_file_ptr == NULL)
+		{
+			printf("PID = %d failed to open file in Write mode\n", getpid());
+			exit(0);
+		}
+		printf("PID = %d opened file in Write mode\n", getpid());
+	}
+	else
+	{
+		log_file_ptr = fopen(LogFilePath,"a");
+		if(log_file_ptr == NULL)
+		{
+			printf("PID = %d failed to open file in Append mode\n", getpid());
+			exit(0);
+		}
+		printf("PID = %d opened file in Append mode\n", getpid());
+	}
+
+	gettimeofday(&Now,NULL);
+	fprintf(log_file_ptr, "[%lu.%06lu] %s \n", Now.tv_sec,Now.tv_usec,message.str);	
+	fclose(log_file_ptr);
+}
+
+/*
 int main(void)
 {
 	FILE *FP;
@@ -73,4 +114,4 @@ int main(void)
 	}
 
 	return 0;
-}
+}*/
