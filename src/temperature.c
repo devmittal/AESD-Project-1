@@ -1,12 +1,12 @@
 /*****************************************************************************
-​ ​* ​ ​ @file​ ​  		temperature.c
-​ * ​ ​ @brief​ ​ 		Contains function definitions to communicate with
- *					temperature sensor TMP102.
- *	 @Comm Type 	I2C
- *   @Tools_Used 	ARM-LINUX-GCC
-​ * ​ ​ @Author(s)​  	​​Souvik De, Devansh Mittal
-​ * ​ ​ @Date​ ​​ 		March 16th, 2019
-​ * ​ ​ @version​ ​ 		1.0
+ * @file  		temperature.c
+ * @brief 		Contains function definitions to communicate with
+ *			temperature sensor TMP102.
+ * @Comm Type 		I2C
+ * @Tools_Used 		ARM-LINUX-GCC
+ * @Author(s)		Souvik De, Devansh Mittal
+ * @Date 		March 16th, 2019
+ * @version 		1.0
 *****************************************************************************/
 
 #include "../inc/temperature.h"
