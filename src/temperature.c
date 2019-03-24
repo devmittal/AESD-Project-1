@@ -60,24 +60,26 @@ uint8_t* read_PointedRegister(int fd)
 	return data;
 }
 
-float read_temperature(int fd)
+tempt_t read_temperature(int fd)
 {
 	uint8_t *data = 0;
 	uint16_t temperature_hex = 0;
-	float temperature_celcius = 0;
+	tempt_t temperature;
 
 	write_PointerRegister(fd,TEMPERATURE_REG);
 	data = read_PointedRegister(fd);
 
 	temperature_hex = ((*data << 8) | *(data + 1)) >> 4;
-	temperature_celcius = temperature_hex * SCALING_FACTOR;
+	temperature.celcius = temperature_hex * SCALING_FACTOR;
+	temperature.farenheit = (temperature.celcius * 1.8) + 32;
+	temperature.kelvin = temperature.celcius + 273.15;
 
-	return temperature_celcius;
+	return temperature;
 }
 
 int main()
 {
 	int fd = init_temperature();
-	printf("\n\nTemp = %f\n\n",read_temperature(fd));
+	printf("\n\nTemp = %f\n\n",read_temperature(fd).celcius);
 	return 0;
 }

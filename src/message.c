@@ -1,0 +1,66 @@
+/*****************************************************************************
+​ ​* ​ ​@File​ ​  		message.c
+ *	@Brief			Contains function definitions for message.h.
+ *	@Comm Type 		I2C
+ *  @Tools_Used 	ARM-LINUX-GCC
+​ * ​ ​@Author(s)​  	​​Souvik De, Devansh Mittal
+​ * ​ ​@Date​ ​​ 			March 24th, 2019
+​ * ​ ​@version​ ​ 		1.0
+*****************************************************************************/
+
+#include "../inc/message.h"
+
+mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize)
+{
+	mqd_t fd;
+	struct mq_attr fd_attr;
+
+	msgqueue_FD_attr.mq_maxmsg = QueueSize;
+	msgqueue_FD_attr.mq_msgsize = sizeof(mesg_t);
+
+	fd = mq_open(QueueName, O_CREAT | O_RDWR, 0666, &fd_attr);
+
+	return fd;
+}
+
+int send_Message(char *QueueName, uint8_t QueueSize, mesg_t* message)
+{
+	int value = 0;
+	mqd_t fd;
+
+	fd = open_MessageQueue(QueueName, QueueSize);
+	if(fd == -1)
+	{
+		return -1;
+	}
+
+	value = mq_send(fd, (char *)message, sizeof(mesg_t),0);
+
+	CloseUnlinkQueue(fd, QueueName);
+
+	return value;
+}
+
+int recv_Message(char *QueueName, uint8_t QueueSize, mesg_t* message)
+{
+	int value = 0;
+	mqd_t fd;
+
+	fd = open_MessageQueue(QueueName, QueueSize);
+	if(fd == -1)
+	{
+		return -1;
+	}
+
+	value = mq_receive(msgqueue_FD, (char *)message, sizeof(mesg_t),0);
+
+	CloseUnlinkQueue(fd, QueueName);
+
+	return value;
+}
+
+void CloseUnlinkQueue(mqd_t fd, char* QueueName)
+{
+	mq_close(fd);
+	mq_unlink(QueueName);	
+}
