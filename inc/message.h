@@ -37,8 +37,8 @@ typedef struct Message
 }mesg_t;
 
 mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize);
-int send_Message(mqd_t fd, mesg_t* message);
-int recv_Message(mqd_t fd, mesg_t* message);
+int send_Message(char *QueueName, uint8_t QueueSize, mesg_t* message);
+int recv_Message(char *QueueName, uint8_t QueueSize, mesg_t* message);
 void CloseUnlinkQueue(mqd_t fd, char* QueueName);
 
 #endif

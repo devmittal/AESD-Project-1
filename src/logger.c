@@ -9,11 +9,15 @@
 *****************************************************************************/
 
 #include"../inc/logger.h"
+#include "../inc/message.h"
 
-int write_log(int IsFileCreated, char * LogFilePath, mesg_t *message)
+int write_log(int IsFileCreated, char * LogFilePath)
 {
 	int value = 0;
+	FILE *log_file_ptr;
 	mesg_t message;
+
+	uint8_t size = LOGGR_QSIZE;
 
 	value = recv_Message(LOGGR_QNAME, LOGGR_QSIZE, &message);
 	if(value == -1)

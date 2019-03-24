@@ -26,7 +26,7 @@
 
 typedef struct Temperature
 {
-	float clecius;
+	float celcius;
 	float farenheit;
 	float kelvin;
 }tempt_t;

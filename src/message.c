@@ -15,8 +15,8 @@ mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize)
 	mqd_t fd;
 	struct mq_attr fd_attr;
 
-	msgqueue_FD_attr.mq_maxmsg = QueueSize;
-	msgqueue_FD_attr.mq_msgsize = sizeof(mesg_t);
+	fd_attr.mq_maxmsg = QueueSize;
+	fd_attr.mq_msgsize = sizeof(mesg_t);
 
 	fd = mq_open(QueueName, O_CREAT | O_RDWR, 0666, &fd_attr);
 
@@ -52,7 +52,7 @@ int recv_Message(char *QueueName, uint8_t QueueSize, mesg_t* message)
 		return -1;
 	}
 
-	value = mq_receive(msgqueue_FD, (char *)message, sizeof(mesg_t),0);
+	value = mq_receive(fd, (char *)message, sizeof(mesg_t),0);
 
 	CloseUnlinkQueue(fd, QueueName);
 

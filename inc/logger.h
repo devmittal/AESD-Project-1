@@ -12,8 +12,8 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include "message.h"
+#include <sys/time.h>
 
-int write_log(int IsFileCreated, char *LogFilePath, mesg_t *message);
+int write_log(int IsFileCreated, char *LogFilePath);
 
 #endif
