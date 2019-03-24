@@ -1,6 +1,6 @@
 /*****************************************************************************
 ​ ​* ​ ​ @file​ ​  		temperature.c
-​ * ​ ​ @brief​ ​ 		Contains function definations to communicate with
+​ * ​ ​ @brief​ ​ 		Contains function definitions to communicate with
  *					temperature sensor TMP102.
  *	 @Comm Type 	I2C
  *   @Tools_Used 	ARM-LINUX-GCC
@@ -19,7 +19,7 @@ int init_temperature(void)
 	FD = open(FD_I2C, O_RDWR);
 	if(FD < 0) 
 	{
-		perror("Error encountered while openning I2C File Descriptor");
+		perror("Error encountered while opening I2C File Descriptor");
 		exit(-1);
 	}
 
