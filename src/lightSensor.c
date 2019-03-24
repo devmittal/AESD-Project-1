@@ -2,7 +2,7 @@
 ​ ​* ​ ​ @file​ ​  		lightSensor.c
 ​ * ​ ​ @brief​ ​ 		Contains function definitions to communicate with
  *			light sensor APDS-9301.
- *	@Comm Type 	I2C
+ *   @Comm Type 	I2C
  *   @Tools_Used 	Compiler: ARM-LINUX-GCC; Board: BeagleBone Green
 ​ * ​ ​ @Author(s)​  	​​Devansh Mittal, Souvik De
 ​ * ​ ​ @Date​ ​​ 		March 24th, 2019
