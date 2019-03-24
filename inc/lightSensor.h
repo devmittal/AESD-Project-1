@@ -21,6 +21,7 @@
 #include<fcntl.h>
 #include<mqueue.h>
 #include<unistd.h>
+#include<math.h>
 
 #define DEV_ADDR (0x39)
 #define CMD_ID_REGISTER (0x8A)
@@ -29,7 +30,7 @@
 #define CMD_DATA0LOW_REGISTER_16 (0xAC)
 #define CMD_DATA0LOW_REGISTER_8 (0x8C)
 #define CMD_DATA0HIGH_REGISTER_8 (0x8D)
-
+#define CMD_DATA1LOW_REGISTER_16 (0xAE)
 
 int init_lightSensor(void);
 void startup_test(int fd);
@@ -38,3 +39,5 @@ uint8_t read_register_8(int fd);
 uint8_t* read_register_16(int fd);
 void power_up(int fd);
 int read_visible_light(int fd);
+void cal_lumen(int ch0, int ch1);
+int read_IR_light(int fd);

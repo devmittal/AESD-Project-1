@@ -137,14 +137,56 @@ int read_visible_light(int fd)
 	final_lux = (*(lux + 1) << 8) | *lux;
 
 	printf("\nChannel 0 Lux - %d | %X", final_lux, final_lux);
+
+	return final_lux;
+}
+
+int read_IR_light(int fd)
+{
+	uint8_t* lux;
+	int final_lux;
+
+	write_register(fd, CMD_DATA1LOW_REGISTER_16);
+	lux = read_register_16(fd);
+
+	final_lux = (*(lux + 1) << 8) | *lux;
+
+	printf("\nChannel 1 Lux - %d | %X", final_lux, final_lux);
+
+	return final_lux;
+}
+
+void cal_lumen(int ch0, int ch1)
+{
+	double div_result, lux;
+
+	printf("\nch0: %d | ch1: %d",ch0,ch1);
+	div_result = (double)ch1/(double)ch0;
+	printf("\ndiv_result: %f",div_result);
+
+	if(div_result > 0 && div_result <= 0.50)
+		lux = (.0304 * ch0) - (.062 * ch0 * pow(div_result,1.4));
+	else if(div_result > 0.5 && div_result <= 0.61)
+		lux = (0.0224 * ch0) - (.031 * ch1);
+	else if(div_result > 0.61 && div_result <= 0.80)
+		lux = (0.0128 * ch0) - (.0153 * ch1);
+	else if(div_result > 0.80 && div_result <= 1.30)
+		lux = (0.00146 * ch0) - (.00112 * ch1);
+	else
+		lux = 0;
+
+	printf("\nLumen: %f",lux);
 }
 
 int main(void)
 {
 	int fd;
+	int ch0, ch1;
 	fd = init_lightSensor();
 	startup_test(fd);
 	power_up(fd);
-	read_visible_light(fd);
+	ch0 = read_visible_light(fd);
+	ch1 = read_IR_light(fd);
+	cal_lumen(ch0,ch1);
 	return 0;
 }
