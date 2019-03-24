@@ -25,8 +25,10 @@
 
 #define TEMPT_QNAME	("/tempt_queue")
 #define LIGHT_QNAME	("/light_queue")
+#define	LOGGR_QNAME	("/logger_queue")
 #define	TEMPT_QSIZE	(8)
 #define	LIGHT_QSIZE	(8)
+#define	LOGGR_QSIZE	(8)
 
 typedef struct Message
 {
