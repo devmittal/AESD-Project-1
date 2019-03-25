@@ -9,7 +9,7 @@
  * @version 		1.0
 *****************************************************************************/
 
-#include "../inc/temperature.h"
+#include "../inc/i2c.h"
 
 int init_i2c(uint8_t DeviceID)
 {

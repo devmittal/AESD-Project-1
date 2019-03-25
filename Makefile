@@ -1,11 +1,16 @@
 vpath %.c src
 vpath %.h inc
 
-all: 	i2c.c
-	arm-linux-gcc -pthread i2c.c -o i2c_program -lrt
+proj: 	lightSensor.o i2c.o
+	arm-linux-gcc -pthread -o proj lightSensor.o i2c.o
 
+lightSensor.o: lightSensor.c lightSensor.h i2c.h
+	arm-linux-gcc -pthread -c src/lightSensor.c
+
+i2c.o: i2c.c i2c.h
+	arm-linux-gcc -pthread -c src/i2c.c
 
 clean:
 	rm -f *.o
-	rm -f i2c
+	rm -f proj
 
