@@ -11,77 +11,15 @@
 
 #include "../inc/lightSensor.h"
 
-int init_lightSensor(void)
-{
-	char *FD_I2C = "/dev/i2c-2";
-	int FD = 0;
-
-	FD = open(FD_I2C, O_RDWR);
-	if(FD < 0) 
-	{
-		perror("Error encountered while opening I2C File Descriptor");
-		exit(-1);
-	}
-
-	if(ioctl(FD, I2C_SLAVE, DEV_ADDR) < 0) 
-	{
-		perror("Error encountered while initializing light sensor");
-		exit(-1);
-	}
-
-	return FD;
-}
-
-int write_register(int fd, uint8_t register_type)
-{
-	int status = 0;
-
-	status = write(fd, &register_type, sizeof(register_type));
-	if (status < 0)
-	{
-		perror("Error encountered while writing to register");
-	}
-
-	return status;
-}
-
-uint8_t read_register_8(int fd)
-{
-	static uint8_t data[1] = {0};
-	int status;
-
-	status = read(fd, data, sizeof(data));
-	if (status != 1)
-	{
-		perror("Error encountered while reading from register");
-		exit(-1);
-	}
-
-	return data[0];
-}
-
-uint8_t* read_register_16(int fd)
-{
-	static uint8_t data[2] = {0};
-	int status;
-
-	status = read(fd, data, sizeof(data));
-	if (status != 2)
-	{
-		perror("Error encountered while reading from register");
-		exit(-1);
-	}
-
-	return data;
-}
-
 void startup_test(int fd)
 {
 	uint8_t id;
+	int fd = 0;
 
-	write_register(fd, CMD_ID_REGISTER);
-	id = read_register_8(fd);
+	fd = init_i2c(APDS_9301_DEV_ID);
+	write_i2c(fd, CMD_ID_REGISTER);
 
+	id = read_i2c8(fd);
 	if(id == 0x50)
 	{
 		printf("\nLight sensor Functional");
@@ -92,16 +30,20 @@ void startup_test(int fd)
 		printf("\nLight sensor not functional");
 		/* print to log file */
 	}
+
+	close_i2c(fd);
 }
 
 void power_up(int fd)
 {
 	uint8_t control_register_data;
+	int fd = 0;
 
-	write_register(fd, CMD_CONTROL_REGISTER);
-	write_register(fd, CONTROL_REGISTER);
-	control_register_data = read_register_8(fd);
+	fd = init_i2c(APDS_9301_DEV_ID);
+	write_i2c(fd, CMD_CONTROL_REGISTER);
+	write_i2c(fd, CONTROL_REGISTER);
 
+	control_register_data = read_i2c8(fd);
 	if(control_register_data == 0x33)
 	{
 		printf("\nLight Sensor powered up");
@@ -112,6 +54,8 @@ void power_up(int fd)
 		printf("\nLight sensor not powered up! x_x");
 		/* print to log file */
 	}
+
+	close_i2c(fd);
 }
 
 int read_visible_light(int fd)
@@ -119,6 +63,9 @@ int read_visible_light(int fd)
 	uint8_t* lux;
 	//uint8_t lux1, lux2;
 	int final_lux;
+	int fd = 0;
+
+	fd = init_i2c(APDS_9301_DEV_ID);
 	
 	/*write_register(fd, CMD_DATA0LOW_REGISTER_8);
 	lux1 = read_register_8(fd); 
@@ -131,8 +78,10 @@ int read_visible_light(int fd)
 
 	printf("\nChannel 0 Lux - %d | %X",final_lux1,final_lux1);*/
 
-	write_register(fd, CMD_DATA0LOW_REGISTER_16);
-	lux = read_register_16(fd);
+	write_i2c(fd, CMD_DATA0LOW_REGISTER_16);
+	lux = read_i2c16(fd);
+
+	close_i2c(fd);
 
 	final_lux = (*(lux + 1) << 8) | *lux;
 
@@ -145,9 +94,13 @@ int read_IR_light(int fd)
 {
 	uint8_t* lux;
 	int final_lux;
+	int fd = 0;
 
-	write_register(fd, CMD_DATA1LOW_REGISTER_16);
-	lux = read_register_16(fd);
+	fd = init_i2c(APDS_9301_DEV_ID);
+	write_i2c(fd, CMD_DATA1LOW_REGISTER_16);
+	lux = read_i2c16(fd);
+
+	close_i2c(fd);
 
 	final_lux = (*(lux + 1) << 8) | *lux;
 
@@ -180,9 +133,7 @@ void cal_lumen(int ch0, int ch1)
 
 int main(void)
 {
-	int fd;
 	int ch0, ch1;
-	fd = init_lightSensor();
 	startup_test(fd);
 	power_up(fd);
 	ch0 = read_visible_light(fd);
