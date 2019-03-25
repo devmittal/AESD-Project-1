@@ -22,6 +22,13 @@
 #define CMD_DATA0HIGH_REGISTER_8 (0x8D)
 #define CMD_DATA1LOW_REGISTER_16 (0xAE)
 
+typedef struct Light
+{
+	int lux_visiblelight;
+	int lux_irlight;
+	double lumen;
+}light_t;
+
 void startup_test(void);
 void power_up(void);
 int read_visible_light(void);

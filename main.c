@@ -1,8 +1,9 @@
-#include <stdio.h>
-#include <pthread.h>
-#include <stdlib.h>
-#include "inc/temperature.h"
 #include "inc/logger.h"
+#include "inc/message.h"
+#include "inc/lightsensor.h"
+#include "inc/temperature.h"
+
+
 
 #define NUM_THREADS (4)
 

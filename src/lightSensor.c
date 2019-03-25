@@ -109,7 +109,7 @@ int read_IR_light(void)
 	return final_lux;
 }
 
-void cal_lumen(int ch0, int ch1)
+double cal_lumen(int ch0, int ch1)
 {
 	double div_result, lux;
 
@@ -129,4 +129,6 @@ void cal_lumen(int ch0, int ch1)
 		lux = 0;
 
 	printf("\nLumen: %f",lux);
+
+	return lux;
 }
