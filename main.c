@@ -25,12 +25,19 @@ typedef struct my_thread
 
 void temperature(void *tempeature_thread)
 {
-	printf("\nTemperature = %f\n",read_temperature().celcius);
+	while(1)
+	{
+		printf("\nTemperature = %f\n",read_temperature().celcius);
+	}
 }
 
 void light(void *temperature_light)
 {
-	printf("\nVisible Light Lux =%d\n", read_visible_light());
+	power_up();
+	while(1)
+	{
+		printf("\nVisible Light Lux =%d\n", read_visible_light());
+	}
 }
 
 int main(int argc, char *argv[])
