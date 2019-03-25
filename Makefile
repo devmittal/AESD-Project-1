@@ -7,16 +7,31 @@ CC = /home/devansh3/Broot/buildroot/output/host/usr/bin/arm-linux-gcc
 CC = /home/souvik/Buildroot/buildroot/output/host/usr/bin/arm-linux-gcc
 #endif
 
-proj: 	temperature.o i2c.o
-	$(CC) -pthread -o proj temperature.o i2c.o -lm
+OBJ_DEPS = main.o i2c.o temperature.o lightSensor.o message.o logger.o
+LIB_DEPS = i2c.h temperature.h lightSensor.h message.h logger.h
 
-temperature.o: temperature.c temperature.h i2c.h
-	$(CC) -pthread -c src/temperature.c -lm
+proj:		$(OBJ_DEPS)
+		$(CC) -o proj $(OBJ_DEPS) -pthread -lrt -lm
 
-i2c.o: i2c.c i2c.h
-	$(CC) -pthread -c src/i2c.c
+main.o:		main.c $(LIB_DEPS)
+		$(CC) -c main.c -pthread
 
+i2c.o:		i2c.c i2c.h
+		$(CC) -c src/i2c.c
+
+temperature.o:	temperature.c temperature.h i2c.h
+		$(CC) -c src/temperature.c -pthread
+
+lightSensor.o:	lightSensor.c lightSensor.h i2c.h
+		$(CC) -c src/lightSensor.c -lm
+
+message.o:	message.c message.h temperature.h
+		$(CC) -c src/message.c -lrt
+
+logger.o:	logger.c logger.h
+		$(CC) -c src/logger.c
+	
 clean:
-	rm -f *.o
-	rm -f proj
+		rm -f *.o
+		rm -f proj
 

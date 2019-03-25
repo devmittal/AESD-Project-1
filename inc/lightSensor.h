@@ -32,5 +32,5 @@ typedef struct Light
 void startup_test(void);
 void power_up(void);
 int read_visible_light(void);
-void cal_lumen(int ch0, int ch1);
+double cal_lumen(int ch0, int ch1);
 int read_IR_light(void);

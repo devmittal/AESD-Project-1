@@ -9,10 +9,10 @@
 
 #include <pthread.h>
 
-#include "i2c.h"
+#include "inc/i2c.h"
 #include "inc/logger.h"
 #include "inc/message.h"
-#include "inc/lightsensor.h"
+#include "inc/lightSensor.h"
 #include "inc/temperature.h"
 
 #define NUM_THREADS (2)
@@ -31,7 +31,7 @@ void temperature(void *tempeature_thread)
 	}
 }
 
-void light(void *temperature_light)
+void light(void *light_thread)
 {
 	power_up();
 	while(1)
@@ -85,13 +85,13 @@ int main(int argc, char *argv[])
 		exit(-1);
 	}
 
-	if(pthread_create(&threads[0],  (void *)0, temperature, (void *) t_temperature))
+	if(pthread_create(&thread[0], NULL, (void *)temperature, (void *)t_temperature))
 	{
 		perror("\nError! Could not create temperature thread: ");
 		exit(-1);
 	}
 
-	if(pthread_create(&threads[1],  (void *)0, light, (void *) t_light))
+	if(pthread_create(&thread[1], NULL, (void *)light, (void *)t_light))
 	{
 		perror("\nError! Could not create light sensor thread: ");
 		exit(-1);
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
 	for(parser = 0 ; parser < 4 ; parser++)
 	{
-		pthread_join(threads[i],NULL);
+		pthread_join(thread[parser],NULL);
 	}
 
 	pthread_mutex_destroy(&i2c_bus_lock);
