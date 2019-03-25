@@ -11,7 +11,7 @@
 
 #include "../inc/lightSensor.h"
 
-void startup_test(int fd)
+void startup_test(void)
 {
 	uint8_t id;
 	int fd = 0;
@@ -34,7 +34,7 @@ void startup_test(int fd)
 	close_i2c(fd);
 }
 
-void power_up(int fd)
+void power_up(void)
 {
 	uint8_t control_register_data;
 	int fd = 0;
@@ -58,7 +58,7 @@ void power_up(int fd)
 	close_i2c(fd);
 }
 
-int read_visible_light(int fd)
+int read_visible_light(void)
 {
 	uint8_t* lux;
 	//uint8_t lux1, lux2;
@@ -90,7 +90,7 @@ int read_visible_light(int fd)
 	return final_lux;
 }
 
-int read_IR_light(int fd)
+int read_IR_light(void)
 {
 	uint8_t* lux;
 	int final_lux;
@@ -134,10 +134,10 @@ void cal_lumen(int ch0, int ch1)
 int main(void)
 {
 	int ch0, ch1;
-	startup_test(fd);
-	power_up(fd);
-	ch0 = read_visible_light(fd);
-	ch1 = read_IR_light(fd);
+	startup_test();
+	power_up();
+	ch0 = read_visible_light();
+	ch1 = read_IR_light();
 	cal_lumen(ch0,ch1);
 	return 0;
 }

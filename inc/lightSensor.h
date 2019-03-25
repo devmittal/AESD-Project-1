@@ -22,8 +22,8 @@
 #define CMD_DATA0HIGH_REGISTER_8 (0x8D)
 #define CMD_DATA1LOW_REGISTER_16 (0xAE)
 
-void startup_test(int fd);
-void power_up(int fd);
-int read_visible_light(int fd);
+void startup_test(void);
+void power_up(void);
+int read_visible_light(void);
 void cal_lumen(int ch0, int ch1);
-int read_IR_light(int fd);
+int read_IR_light(void);
