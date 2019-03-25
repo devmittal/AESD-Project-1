@@ -130,14 +130,3 @@ void cal_lumen(int ch0, int ch1)
 
 	printf("\nLumen: %f",lux);
 }
-
-int main(void)
-{
-	int ch0, ch1;
-	startup_test();
-	power_up();
-	ch0 = read_visible_light();
-	ch1 = read_IR_light();
-	cal_lumen(ch0,ch1);
-	return 0;
-}

@@ -11,7 +11,7 @@
 
 #include "../inc/temperature.h"
 
-tempt_t read_temperature(int fd)
+tempt_t read_temperature(void)
 {
 	int fd = 0;
 	uint8_t *data = 0;
@@ -30,10 +30,4 @@ tempt_t read_temperature(int fd)
 	close_i2c(fd);
 
 	return temperature;
-}
-
-int main()
-{
-	printf("\n\nTemp = %f\n\n",read_temperature(fd).celcius);
-	return 0;
 }

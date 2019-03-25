@@ -25,9 +25,6 @@ typedef struct Temperature
 
 enum Registor_Address{TEMPERATURE_REG, CONFIGURATION_REG, TLOW_REG, THIGH_REG};
 
-int init_temperature(void);
-tempt_t read_temperature(int fd);
-uint8_t write_PointerRegister(int fd, uint8_t register_type);
-uint8_t* read_PointedRegister(int fd);
+tempt_t read_temperature(void);
 
 #endif

@@ -7,11 +7,11 @@ CC = /home/devansh3/Broot/buildroot/output/host/usr/bin/arm-linux-gcc
 CC = /home/souvik/Buildroot/buildroot/output/host/usr/bin/arm-linux-gcc
 #endif
 
-proj: 	lightSensor.o i2c.o
-	$(CC) -pthread -o proj lightSensor.o i2c.o -lm
+proj: 	temperature.o i2c.o
+	$(CC) -pthread -o proj temperature.o i2c.o -lm
 
-lightSensor.o: lightSensor.c lightSensor.h i2c.h
-	$(CC) -pthread -c src/lightSensor.c -lm
+temperature.o: temperature.c temperature.h i2c.h
+	$(CC) -pthread -c src/temperature.c -lm
 
 i2c.o: i2c.c i2c.h
 	$(CC) -pthread -c src/i2c.c
