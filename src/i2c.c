@@ -74,7 +74,7 @@ uint8_t* read_i2c16(int fd)
 
 uint8_t read_i2c8(int fd)
 {
-	uint8_t data = 0;
+	static uint8_t data[1] = {0};
 	int value = 0;
 
 	pthread_mutex_lock(&i2c_bus_lock);
@@ -87,7 +87,7 @@ uint8_t read_i2c8(int fd)
 		exit(-1);
 	}
 
-	return data;
+	return data[0];
 }
 
 void close_i2c(int fd)
