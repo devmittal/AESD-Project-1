@@ -1,11 +1,12 @@
 /*****************************************************************************
-​ ​* ​ ​@File​ ​  		i2c.c
-​ * ​ ​@Brief​ ​ 		Contains function definitions imperative to shared i2c
- *					access by the temperature and light sensor.
- *  @Tools_Used 	ARM-LINUX-GCC
-​ * ​ ​@Author(s)​  	​​Souvik De, Devansh Mittal
- *	@Date​			March 24th, 2019
-​ * ​ ​@version​ ​ 		1.0
+ * @File  		i2c.c
+ * @Brief		Contains function definitions imperative to shared i2c
+ *			access by the temperature and light sensor.
+ * @COMM		I2C
+ * @Tools_Used 		ARM-LINUX-GCC
+ * @Author(s)		Souvik De, Devansh Mittal
+ * @Date		March 24th, 2019
+ * @version 		1.0
 *****************************************************************************/
 
 #include "../inc/temperature.h"
