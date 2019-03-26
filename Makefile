@@ -2,15 +2,15 @@ vpath %.c src
 vpath %.h inc
 
 PLATFORM=BBG
-SOURCE=DEVANSH
 TARGET=proj
 
 ifeq ($(PLATFORM),BBG)
 	ifeq ($(SOURCE),DEVANSH)
 		CC=/home/devansh3/Broot/buildroot/output/host/usr/bin/arm-linux-gcc
 	else
-		CC=/home/souvik/Buildroot/buildroot/output/host/usr/bin/arm-linux-gcc
+		CC=/home/souvik/Buildroot/buildroot/output/host/usr/bin/arm-linux-gcc			
 	endif
+	
 else
 	CC=gcc
 endif
@@ -20,10 +20,14 @@ LIB_DEPS = i2c.h temperature.h lightSensor.h message.h logger.h
 
 all:		$(OBJ_DEPS)
 		$(CC) -o $(TARGET) $(OBJ_DEPS) -pthread -lrt -lm
+		@echo
+		@echo "							*************************************"
+		@echo "							* Built Successfully With No Errors *"
+		@echo "							*************************************"
+		@echo
 		
 ifeq ($(PLATFORM),BBG)
 	scp $(TARGET) root@10.0.0.219:/usr/bin
-	ssh root@10.0.0.219 "cd /usr/bin && ./$(TARGET)"
 else
 	./$(TARGET)
 endif
