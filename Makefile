@@ -20,6 +20,7 @@ LIB_DEPS = i2c.h temperature.h lightSensor.h message.h logger.h
 
 all:		$(OBJ_DEPS)
 		$(CC) -o $(TARGET) $(OBJ_DEPS) -pthread -lrt -lm
+		
 ifeq ($(PLATFORM),BBG)
 	scp $(TARGET) root@10.0.0.219:/usr/bin
 	ssh root@10.0.0.219 "cd /usr/bin && ./$(TARGET)"
