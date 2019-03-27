@@ -12,7 +12,6 @@
 #include "inc/i2c.h"
 #include "inc/logger.h"
 #include "inc/message.h"
-#include "inc/lightSensor.h"
 #include "inc/temperature.h"
 
 #define NUM_THREADS (3)
@@ -29,7 +28,7 @@ void temperature(void *tempeature_thread)
 
 	while(1)
 	{
-		usleep(20000);
+		usleep(50000);
 		message.temperature = read_temperature();
 		sprintf(message.str,"Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
 		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_TEMPERATURE, &message);
@@ -45,7 +44,8 @@ void light(void *light_thread)
 
 	while(1)
 	{
-		usleep(20000);
+		usleep(50000);
+		message.light = read_LightSensor();
 		sprintf(message.str,"Light data read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
 		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_LIGHT , &message);
 		printf("\nVisible Light Lux =%d\n", read_visible_light());

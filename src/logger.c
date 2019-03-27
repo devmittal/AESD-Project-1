@@ -62,6 +62,15 @@ int write_log(int IsFileCreated, char * LogFilePath)
 			fprintf(log_file_ptr, "\t\t\t|\n");
 			fprintf(log_file_ptr, "\t\t\t--------------->In Kelvin : %f\n",message.temperature.kelvin);
 		}
+		else
+		{
+			fprintf(log_file_ptr, "\t|\n");
+			fprintf(log_file_ptr, "\t--------------->LUX Visible Light : %d\n",message.light.lux_visiblelight);
+			fprintf(log_file_ptr, "\t\t|\n");
+			fprintf(log_file_ptr, "\t\t--------------->LUX Infrared Light : %d\n",message.light.lux_irlight);
+			fprintf(log_file_ptr, "\t\t\t|\n");
+			fprintf(log_file_ptr, "\t\t\t--------------->Lumens : %f\n",message.light.lumen);
+		}
 	}
 
 	fclose(log_file_ptr);

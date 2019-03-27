@@ -34,3 +34,4 @@ void power_up(void);
 int read_visible_light(void);
 double cal_lumen(int ch0, int ch1);
 int read_IR_light(void);
+light_t read_LightSensor(void);

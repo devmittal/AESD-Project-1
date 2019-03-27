@@ -132,3 +132,12 @@ double cal_lumen(int ch0, int ch1)
 
 	return lux;
 }
+
+light_t read_LightSensor(void)
+{
+	light_t light;
+	light.lux_visiblelight = read_visible_light();
+	light.lux_irlight = read_IR_light();
+	light.lumen = cal_lumen(light.lux_visiblelight + light.lux_irlight, light.lux_irlight);
+	return light;
+}

@@ -22,6 +22,7 @@
 #include <mqueue.h>
 #include <sys/stat.h>
 #include "temperature.h"
+#include "lightSensor.h"
 
 #define TEMPT_QNAME	("/tempt_queue")
 #define LIGHT_QNAME	("/light_queue")
@@ -33,6 +34,7 @@
 typedef struct Message
 {
 	tempt_t temperature;
+	light_t light;
 	char str[100];
 }mesg_t;
 
