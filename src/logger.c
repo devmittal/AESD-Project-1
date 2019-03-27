@@ -17,14 +17,6 @@ int write_log(int IsFileCreated, char * LogFilePath)
 	FILE *log_file_ptr;
 	mesg_t message;
 
-	uint8_t size = LOGGR_QSIZE;
-
-	value = recv_Message(LOGGR_QNAME, LOGGR_QSIZE, &message);
-	if(value == -1)
-	{
-		return -1;
-	}
-
 	struct timeval Now;
 
 	if(!IsFileCreated)
@@ -36,20 +28,31 @@ int write_log(int IsFileCreated, char * LogFilePath)
 			exit(0);
 		}
 		printf("PID = %d opened file in Write mode\n", getpid());
+
+		gettimeofday(&Now,NULL);
+		fprintf(log_file_ptr, "[%lu.%06lu] Logfile Create by Logger Thread (Thread ID  = %lu) \n", Now.tv_sec,Now.tv_usec,syscall(__NR_gettid));	
 	}
 	else
 	{
 		log_file_ptr = fopen(LogFilePath,"a");
 		if(log_file_ptr == NULL)
 		{
-			printf("PID = %d failed to open file in Append mode\n", getpid());
+			printf("\nPID = %d failed to open file in Append mode\n", getpid());
 			exit(0);
 		}
 		printf("PID = %d opened file in Append mode\n", getpid());
+
+		value = recv_Message(LOGGR_QNAME, LOGGR_QSIZE, &message);
+		if(value == -1)
+		{
+			perror("Logger Failed to receive message through message queue :");
+			return -1;
+		}
+
+		gettimeofday(&Now,NULL);
+		fprintf(log_file_ptr, "[%lu.%06lu] %s \n", Now.tv_sec,Now.tv_usec, message.str);
 	}
 
-	gettimeofday(&Now,NULL);
-	fprintf(log_file_ptr, "[%lu.%06lu] %s \n", Now.tv_sec,Now.tv_usec,message.str);	
 	fclose(log_file_ptr);
 }
 

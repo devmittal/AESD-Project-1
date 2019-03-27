@@ -21,13 +21,12 @@ tempt_t read_temperature(void)
 	fd = init_i2c(TMP102_DEV_ID);
 	write_i2c(fd, TEMPERATURE_REG);
 	data = read_i2c16(fd);
+	close_i2c(fd);
 
 	temperature_hex = ((*data << 8) | *(data + 1)) >> 4;
 	temperature.celcius = temperature_hex * SCALING_FACTOR;
 	temperature.farenheit = (temperature.celcius * 1.8) + 32;
 	temperature.kelvin = temperature.celcius + 273.15;
-
-	close_i2c(fd);
 
 	return temperature;
 }
