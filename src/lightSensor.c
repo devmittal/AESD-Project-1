@@ -58,25 +58,119 @@ void power_up(void)
 	close_i2c(fd);
 }
 
+uint8_t read_control_register(void)
+{
+	int fd;
+	uint8_t control_register_data;
+
+	fd = init_i2c(APDS_9301_DEV_ID);
+	write_i2c(fd, CMD_CONTROL_REGISTER);		
+	control_register_data = read_i2c8(fd);
+
+	close_i2c(fd);
+
+	return control_register_data;
+}
+
+void set_timing_register(uint8_t integ, uint8_t gain)
+{
+	int fd;
+	uint8_t timing_register_data;
+	uint8_t new_timing_register_data;
+
+	fd = init_i2c(APDS_9301_DEV_ID);
+	write_i2c(fd, CMD_TIMING_REGISTER);		
+	timing_register_data = read_i2c8(fd);	
+	
+	new_timing_register_data = (timing_register_data & ~(0x13)) | integ | (gain << 4);
+	
+	write_i2c(fd, new_timing_register_data);
+
+	close_i2c(fd);
+}
+
+uint8_t read_timing_register(void)
+{
+	int fd;
+	uint8_t timing_register_data;
+
+	fd = init_i2c(APDS_9301_DEV_ID);
+	write_i2c(fd, CMD_TIMING_REGISTER);		
+	timing_register_data = read_i2c8(fd);
+
+	close_i2c(fd);
+
+	return timing_register_data;
+}
+
+void enable_interrupt(uint8_t interrupt_persist)
+{
+	int fd;
+	uint8_t interrupt_control_register_data;
+
+	fd = init_i2c(APDS_9301_DEV_ID);
+	write_i2c(fd, CMD_INTERRUPT_CONTROL_REGISTER);
+
+	interrupt_control_register_data = (INTERRUPT_ENABLE) | interrupt_persist;
+	write_i2c(fd, interrupt_control_register_data);
+
+	close_i2c(fd);
+}
+
+void disable_interrupt(void)
+{
+	int fd;
+
+	fd = init_i2c(APDS_9301_DEV_ID);
+	write_i2c(fd, CMD_INTERRUPT_CONTROL_REGISTER);
+	write_i2c(fd, INTERRUPT_DISABLE);
+
+	close_i2c(fd);
+}
+
+void set_interrupt_threshold(uint16_t thresh_low, uint16_t thresh_high)
+{
+	int fd;
+
+	fd = init_i2c(APDS_9301_DEV_ID);
+	
+	write_i2c(fd, CMD_INTERRUPT_THRESHOLD_REGISTER_LOW);
+	write_i2c16(fd, thresh_low);
+
+	write_i2c(fd, CMD_INTERRUPT_THRESHOLD_REGISTER_HIGH);
+	write_i2c16(fd, thresh_high);
+
+	close_i2c(fd);
+}
+
+uint16_t* read_interrupt_threshold(void)
+{
+	int fd;
+	uint8_t* interrupt_threshold_data;
+	static uint16_t threshold[2] = {0};
+
+	fd = init_i2c(APDS_9301_DEV_ID);
+	
+	write_i2c(fd, CMD_INTERRUPT_THRESHOLD_REGISTER_LOW);
+	interrupt_threshold_data = read_i2c16(fd);
+	threshold[0] = (*(interrupt_threshold_data + 1) << 8) | *interrupt_threshold_data;
+
+	write_i2c(fd, CMD_INTERRUPT_THRESHOLD_REGISTER_HIGH);
+	interrupt_threshold_data = read_i2c16(fd);	
+	threshold[1] = (*(interrupt_threshold_data + 1) << 8) | *interrupt_threshold_data;
+
+	close_i2c(fd);
+
+	return threshold;
+}
+
 int read_visible_light(void)
 {
 	uint8_t* lux;
-	//uint8_t lux1, lux2;
 	int final_lux;
 	int fd = 0;
 
 	fd = init_i2c(APDS_9301_DEV_ID);
-	
-	/*write_register(fd, CMD_DATA0LOW_REGISTER_8);
-	lux1 = read_register_8(fd); 
-	write_register(fd, CMD_DATA0HIGH_REGISTER_8);
-	lux2 = read_register_8(fd);
-
-	printf("\n%X | %X",lux1,lux2);
-
-	final_lux1 = (lux2 << 8) | lux1;
-
-	printf("\nChannel 0 Lux - %d | %X",final_lux1,final_lux1);*/
 
 	write_i2c(fd, CMD_DATA0LOW_REGISTER_16);
 	lux = read_i2c16(fd);
