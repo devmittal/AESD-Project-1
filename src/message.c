@@ -42,7 +42,7 @@ int send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* m
 		exit(-1);	
 	}
 
-	CloseUnlinkQueue(fd, QueueName);
+	//CloseUnlinkQueue(fd, QueueName); //This is creating problem - closing queue before read can happen
 
 	return value;
 }

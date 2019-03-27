@@ -147,21 +147,21 @@ uint16_t* read_interrupt_threshold(void)
 {
 	int fd;
 	uint8_t* interrupt_threshold_data;
-	static uint16_t threshold[2] = {0};
+	static uint16_t final_threshold[2] = {0};
 
 	fd = init_i2c(APDS_9301_DEV_ID);
 	
 	write_i2c(fd, CMD_INTERRUPT_THRESHOLD_REGISTER_LOW);
 	interrupt_threshold_data = read_i2c16(fd);
-	threshold[0] = (*(interrupt_threshold_data + 1) << 8) | *interrupt_threshold_data;
+	final_threshold[0] = (*(interrupt_threshold_data + 1) << 8) | *interrupt_threshold_data;
 
 	write_i2c(fd, CMD_INTERRUPT_THRESHOLD_REGISTER_HIGH);
 	interrupt_threshold_data = read_i2c16(fd);	
-	threshold[1] = (*(interrupt_threshold_data + 1) << 8) | *interrupt_threshold_data;
+	final_threshold[1] = (*(interrupt_threshold_data + 1) << 8) | *interrupt_threshold_data;
 
 	close_i2c(fd);
 
-	return threshold;
+	return final_threshold;
 }
 
 int read_visible_light(void)
@@ -178,8 +178,6 @@ int read_visible_light(void)
 	close_i2c(fd);
 
 	final_lux = (*(lux + 1) << 8) | *lux;
-
-	printf("\nChannel 0 Lux - %d | %X", final_lux, final_lux);
 
 	return final_lux;
 }
@@ -198,8 +196,6 @@ int read_IR_light(void)
 
 	final_lux = (*(lux + 1) << 8) | *lux;
 
-	printf("\nChannel 1 Lux - %d | %X", final_lux, final_lux);
-
 	return final_lux;
 }
 
@@ -209,7 +205,6 @@ double cal_lumen(int ch0, int ch1)
 
 	printf("\nch0: %d | ch1: %d",ch0,ch1);
 	div_result = (double)ch1/(double)ch0;
-	printf("\ndiv_result: %f",div_result);
 
 	if(div_result > 0 && div_result <= 0.50)
 		lux = (.0304 * ch0) - (.062 * ch0 * pow(div_result,1.4));
@@ -227,11 +222,47 @@ double cal_lumen(int ch0, int ch1)
 	return lux;
 }
 
+uint8_t state(double lumen)
+{
+	return (lumen>THRESHOLD) ? 1 : 0;
+}
+
+uint8_t change(uint8_t isLight)
+{
+	static uint8_t previous_state = 0;
+	static int isFirstIteration = 1;
+
+	printf("\nLight State: %d",isLight);
+	printf("\nPrevious State: %d\n\n",previous_state);
+
+	if(isFirstIteration)
+	{
+		previous_state = isLight;
+		isFirstIteration = 0;
+		return 1;
+	}
+	else
+	{
+		if(previous_state != isLight)
+		{
+			previous_state = isLight;
+			return 1;
+		}
+		else
+		{
+			previous_state = isLight;
+			return 0;
+		}
+	}
+}
+
 light_t read_LightSensor(void)
 {
 	light_t light;
 	light.lux_visiblelight = read_visible_light();
 	light.lux_irlight = read_IR_light();
-	light.lumen = cal_lumen(light.lux_visiblelight + light.lux_irlight, light.lux_irlight);
+	light.lumen = cal_lumen(light.lux_visiblelight, light.lux_irlight);
+	light.isLight = state(light.lumen);
+	light.isChange = change(light.isLight);
 	return light;
 }

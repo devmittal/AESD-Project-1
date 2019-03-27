@@ -65,11 +65,17 @@ int write_log(int IsFileCreated, char * LogFilePath)
 		else
 		{
 			fprintf(log_file_ptr, "\t|\n");
-			fprintf(log_file_ptr, "\t--------------->LUX Visible Light : %d\n",message.light.lux_visiblelight);
-			fprintf(log_file_ptr, "\t\t|\n");
-			fprintf(log_file_ptr, "\t\t--------------->LUX Infrared Light : %d\n",message.light.lux_irlight);
+			if(message.light.isLight)
+				fprintf(log_file_ptr, "\t--------------->State : Light\n");
+			else
+				fprintf(log_file_ptr, "\t--------------->State : Dark\n");
+			fprintf(log_file_ptr, "\t|\t\n");
+			fprintf(log_file_ptr, "\t\t--------------->LUX Visible Light : %d\n",message.light.lux_visiblelight);
 			fprintf(log_file_ptr, "\t\t\t|\n");
-			fprintf(log_file_ptr, "\t\t\t--------------->Lumens : %f\n",message.light.lumen);
+			fprintf(log_file_ptr, "\t\t\t--------------->LUX Infrared Light : %d\n",message.light.lux_irlight);
+			fprintf(log_file_ptr, "\t\t\t\t|\n");
+			fprintf(log_file_ptr, "\t\t\t\t--------------->Lumens : %f\n",message.light.lumen);
+			fflush(log_file_ptr);
 		}
 	}
 

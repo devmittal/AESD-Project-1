@@ -44,11 +44,13 @@ void light(void *light_thread)
 
 	while(1)
 	{
-		usleep(50000);
+		usleep(500000);
 		message.light = read_LightSensor();
-		sprintf(message.str,"Light data read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
-		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_LIGHT , &message);
-		printf("\nVisible Light Lux =%d\n", read_visible_light());
+		if(message.light.isChange)
+		{
+			sprintf(message.str,"Change in light state read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
+			send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_LIGHT , &message);		
+		}
 	}
 }
 

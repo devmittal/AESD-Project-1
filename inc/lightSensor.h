@@ -12,6 +12,7 @@
 *****************************************************************************/
 
 #include <math.h>
+#include <stdbool.h>
 #include "i2c.h"
 
 #define CMD_ID_REGISTER (0x8A)
@@ -27,12 +28,15 @@
 #define CMD_DATA1LOW_REGISTER_16 (0xAE)
 #define INTERRUPT_ENABLE (0x10)
 #define INTERRUPT_DISABLE (0x00)
+#define THRESHOLD (1.0)
 
 typedef struct Light
 {
 	int lux_visiblelight;
 	int lux_irlight;
 	double lumen;
+	uint8_t isLight;
+	uint8_t isChange;
 }light_t;
 
 void startup_test(void);
@@ -47,4 +51,6 @@ uint16_t* read_interrupt_threshold(void);
 int read_visible_light(void);
 int read_IR_light(void);
 double cal_lumen(int ch0, int ch1);
+uint8_t change(uint8_t isLight);
+uint8_t state(double lumen);
 light_t read_LightSensor(void);
