@@ -55,6 +55,22 @@ uint8_t write_i2c(int fd, uint8_t register_type)
 	return value;
 }
 
+uint8_t write_i2c16(int fd, uint16_t register_type)
+{
+	int value = 0;
+
+	pthread_mutex_lock(&i2c_bus_lock);
+	value = write(fd, &register_type, sizeof(register_type));
+	pthread_mutex_unlock(&i2c_bus_lock);
+
+	if (value < 0)
+	{
+		perror("Error encountered in I2C write - 16");
+	}
+
+	return value;
+}
+
 uint8_t* read_i2c16(int fd)
 {
 	int value = 0;

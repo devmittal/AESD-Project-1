@@ -28,6 +28,7 @@ int I2C_FileDescriptor;
 
 int init_i2c(uint8_t DeviceID);
 uint8_t write_i2c(int fd, uint8_t register_type);
+uint8_t write_i2c16(int fd, uint16_t register_type);
 uint8_t* read_i2c16(int fd);
 uint8_t read_i2c8(int fd);
 void close_i2c(int fd);
