@@ -31,10 +31,16 @@ int send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* m
 	fd = open_MessageQueue(QueueName, QueueSize);
 	if(fd == -1)
 	{
-		return -1;
+		perror("Failed to open message queue");
+		exit(-1);
 	}
 
 	value = mq_send(fd, (char *)message, sizeof(mesg_t), priority);
+	if(value == -1)
+	{
+		perror("Failed to send message through message queue");
+		exit(-1);	
+	}
 
 	CloseUnlinkQueue(fd, QueueName);
 
@@ -50,7 +56,8 @@ int recv_Message(char *QueueName, uint8_t QueueSize, uint8_t *priority, mesg_t* 
 	fd = open_MessageQueue(QueueName, QueueSize);
 	if(fd == -1)
 	{
-		return -1;
+		perror("Failed to open message queue");
+		exit(-1);
 	}
 
 	value = mq_receive(fd, (char *)message, sizeof(mesg_t), &prio);
