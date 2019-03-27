@@ -5,7 +5,7 @@ PLATFORM=BBG
 TARGET=proj
 
 ifeq ($(PLATFORM),BBG)
-	ifeq ($(SOURCE),DEVANSH)
+	ifeq ($(SOURCE),DEV)
 		CC=/home/devansh3/Broot/buildroot/output/host/usr/bin/arm-linux-gcc
 	else
 		CC=/home/souvik/Buildroot/buildroot/output/host/usr/bin/arm-linux-gcc			
