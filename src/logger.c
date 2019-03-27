@@ -14,6 +14,7 @@
 int write_log(int IsFileCreated, char * LogFilePath)
 {
 	int value = 0;
+	uint8_t queue_priority;
 	FILE *log_file_ptr;
 	mesg_t message;
 
@@ -42,7 +43,7 @@ int write_log(int IsFileCreated, char * LogFilePath)
 		}
 		printf("PID = %d opened file in Append mode\n", getpid());
 
-		value = recv_Message(LOGGR_QNAME, LOGGR_QSIZE, &message);
+		value = recv_Message(LOGGR_QNAME, LOGGR_QSIZE,  &queue_priority, &message);
 		if(value == -1)
 		{
 			perror("Logger Failed to receive message through message queue :");
@@ -51,6 +52,16 @@ int write_log(int IsFileCreated, char * LogFilePath)
 
 		gettimeofday(&Now,NULL);
 		fprintf(log_file_ptr, "[%lu.%06lu] %s \n", Now.tv_sec,Now.tv_usec, message.str);
+
+		if(queue_priority == PRIO_TEMPERATURE)
+		{
+			fprintf(log_file_ptr, "\t|\n");
+			fprintf(log_file_ptr, "\t--------------->In Celcius : %f\n",message.temperature.celcius);
+			fprintf(log_file_ptr, "\t\t|\n");
+			fprintf(log_file_ptr, "\t\t--------------->In Farenheit : %f\n",message.temperature.farenheit);
+			fprintf(log_file_ptr, "\t\t\t|\n");
+			fprintf(log_file_ptr, "\t\t\t--------------->In Kelvin : %f\n",message.temperature.kelvin);
+		}
 	}
 
 	fclose(log_file_ptr);

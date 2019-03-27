@@ -32,7 +32,7 @@ void temperature(void *tempeature_thread)
 		usleep(20000);
 		message.temperature = read_temperature();
 		sprintf(message.str,"Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
-		send_Message(LOGGR_QNAME, LOGGR_QSIZE, &message);
+		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_TEMPERATURE, &message);
 		printf("\nTemperature = %f\n",read_temperature().celcius);
 	}
 }
@@ -47,7 +47,7 @@ void light(void *light_thread)
 	{
 		usleep(20000);
 		sprintf(message.str,"Light data read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
-		send_Message(LOGGR_QNAME, LOGGR_QSIZE, &message);
+		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_LIGHT , &message);
 		printf("\nVisible Light Lux =%d\n", read_visible_light());
 	}
 }

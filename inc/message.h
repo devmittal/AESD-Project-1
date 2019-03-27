@@ -36,9 +36,11 @@ typedef struct Message
 	char str[100];
 }mesg_t;
 
+enum Message_Priority{PRIO_TEMPERATURE, PRIO_LIGHT};
+
 mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize);
-int send_Message(char *QueueName, uint8_t QueueSize, mesg_t* message);
-int recv_Message(char *QueueName, uint8_t QueueSize, mesg_t* message);
+int send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* message);
+int recv_Message(char *QueueName, uint8_t QueueSize, uint8_t *priority, mesg_t* message);
 void CloseUnlinkQueue(mqd_t fd, char* QueueName);
 
 #endif
