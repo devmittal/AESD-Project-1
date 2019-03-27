@@ -12,10 +12,9 @@
 #include "inc/i2c.h"
 #include "inc/logger.h"
 #include "inc/message.h"
-#include "inc/lightSensor.h"
 #include "inc/temperature.h"
 
-#define NUM_THREADS (2)
+#define NUM_THREADS (3)
 
 typedef struct my_thread
 {
@@ -25,18 +24,41 @@ typedef struct my_thread
 
 void temperature(void *tempeature_thread)
 {
+	mesg_t message;
+
 	while(1)
 	{
+		usleep(50000);
+		message.temperature = read_temperature();
+		sprintf(message.str,"Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
+		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_TEMPERATURE, &message);
 		printf("\nTemperature = %f\n",read_temperature().celcius);
 	}
 }
 
 void light(void *light_thread)
 {
+	mesg_t message;
+
 	power_up();
+
 	while(1)
 	{
+		usleep(50000);
+		message.light = read_LightSensor();
+		sprintf(message.str,"Light data read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
+		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_LIGHT , &message);
 		printf("\nVisible Light Lux =%d\n", read_visible_light());
+	}
+}
+
+void logger(void *logger_thread)
+{
+	thread_t *logger = (thread_t*) logger_thread;
+	write_log(0, logger->log);
+	while(1)
+	{
+		write_log(1, logger->log);
 	}
 }
 
@@ -47,6 +69,7 @@ int main(int argc, char *argv[])
 	thread_t *t_parent = NULL;
 	thread_t *t_temperature = NULL;
 	thread_t *t_light = NULL;
+	thread_t *t_logger = NULL;
 
 	int thread_id_seed = 0;
 	int thread_status = 0;
@@ -79,6 +102,15 @@ int main(int argc, char *argv[])
 	t_light->id = thread_id_seed++;
 	t_light->log = argv[1];
 
+	t_logger = (thread_t*)malloc(sizeof(thread_t));
+	if(t_logger == NULL)
+	{
+		printf("\nMalloc for Light Thread failed. Exiting\n");
+		return 0;
+	}
+	t_logger->id = thread_id_seed++;
+	t_logger->log = argv[1];
+
 	if(pthread_mutex_init(&i2c_bus_lock, NULL) != 0)
 	{
 		perror("\nI2C Bus Mutex initialization failed. Exiting \n");
@@ -87,7 +119,7 @@ int main(int argc, char *argv[])
 
 	if(pthread_create(&thread[0], NULL, (void *)temperature, (void *)t_temperature))
 	{
-		perror("\nError! Could not create temperature thread: ");
+		perror("\nError! Could not create temperature sensor thread: ");
 		exit(-1);
 	}
 
@@ -97,7 +129,13 @@ int main(int argc, char *argv[])
 		exit(-1);
 	}	
 
-	for(parser = 0 ; parser < 4 ; parser++)
+	if(pthread_create(&thread[2], NULL, (void *)logger, (void *)t_logger))
+	{
+		perror("\nError! Could not create logger thread: ");
+		exit(-1);
+	}	
+
+	for(parser = 0 ; parser < NUM_THREADS ; parser++)
 	{
 		pthread_join(thread[parser],NULL);
 	}

@@ -23,7 +23,7 @@ mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize)
 	return fd;
 }
 
-int send_Message(char *QueueName, uint8_t QueueSize, mesg_t* message)
+int send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* message)
 {
 	int value = 0;
 	mqd_t fd;
@@ -34,16 +34,17 @@ int send_Message(char *QueueName, uint8_t QueueSize, mesg_t* message)
 		return -1;
 	}
 
-	value = mq_send(fd, (char *)message, sizeof(mesg_t),0);
+	value = mq_send(fd, (char *)message, sizeof(mesg_t), priority);
 
 	CloseUnlinkQueue(fd, QueueName);
 
 	return value;
 }
 
-int recv_Message(char *QueueName, uint8_t QueueSize, mesg_t* message)
+int recv_Message(char *QueueName, uint8_t QueueSize, uint8_t *priority, mesg_t* message)
 {
 	int value = 0;
+	unsigned int prio;
 	mqd_t fd;
 
 	fd = open_MessageQueue(QueueName, QueueSize);
@@ -52,7 +53,8 @@ int recv_Message(char *QueueName, uint8_t QueueSize, mesg_t* message)
 		return -1;
 	}
 
-	value = mq_receive(fd, (char *)message, sizeof(mesg_t),0);
+	value = mq_receive(fd, (char *)message, sizeof(mesg_t), &prio);
+	*priority = prio;
 
 	CloseUnlinkQueue(fd, QueueName);
 

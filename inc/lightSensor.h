@@ -47,3 +47,4 @@ uint16_t* read_interrupt_threshold(void);
 int read_visible_light(void);
 int read_IR_light(void);
 double cal_lumen(int ch0, int ch1);
+light_t read_LightSensor(void);

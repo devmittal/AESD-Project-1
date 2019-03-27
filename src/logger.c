@@ -14,16 +14,9 @@
 int write_log(int IsFileCreated, char * LogFilePath)
 {
 	int value = 0;
+	uint8_t queue_priority;
 	FILE *log_file_ptr;
 	mesg_t message;
-
-	uint8_t size = LOGGR_QSIZE;
-
-	value = recv_Message(LOGGR_QNAME, LOGGR_QSIZE, &message);
-	if(value == -1)
-	{
-		return -1;
-	}
 
 	struct timeval Now;
 
@@ -36,20 +29,50 @@ int write_log(int IsFileCreated, char * LogFilePath)
 			exit(0);
 		}
 		printf("PID = %d opened file in Write mode\n", getpid());
+
+		gettimeofday(&Now,NULL);
+		fprintf(log_file_ptr, "[%lu.%06lu] Logfile Create by Logger Thread (Thread ID  = %lu) \n", Now.tv_sec,Now.tv_usec,syscall(__NR_gettid));	
 	}
 	else
 	{
 		log_file_ptr = fopen(LogFilePath,"a");
 		if(log_file_ptr == NULL)
 		{
-			printf("PID = %d failed to open file in Append mode\n", getpid());
+			printf("\nPID = %d failed to open file in Append mode\n", getpid());
 			exit(0);
 		}
 		printf("PID = %d opened file in Append mode\n", getpid());
+
+		value = recv_Message(LOGGR_QNAME, LOGGR_QSIZE,  &queue_priority, &message);
+		if(value == -1)
+		{
+			perror("Logger Failed to receive message through message queue :");
+			return -1;
+		}
+
+		gettimeofday(&Now,NULL);
+		fprintf(log_file_ptr, "[%lu.%06lu] %s \n", Now.tv_sec,Now.tv_usec, message.str);
+
+		if(queue_priority == PRIO_TEMPERATURE)
+		{
+			fprintf(log_file_ptr, "\t|\n");
+			fprintf(log_file_ptr, "\t--------------->In Celcius : %f\n",message.temperature.celcius);
+			fprintf(log_file_ptr, "\t\t|\n");
+			fprintf(log_file_ptr, "\t\t--------------->In Farenheit : %f\n",message.temperature.farenheit);
+			fprintf(log_file_ptr, "\t\t\t|\n");
+			fprintf(log_file_ptr, "\t\t\t--------------->In Kelvin : %f\n",message.temperature.kelvin);
+		}
+		else
+		{
+			fprintf(log_file_ptr, "\t|\n");
+			fprintf(log_file_ptr, "\t--------------->LUX Visible Light : %d\n",message.light.lux_visiblelight);
+			fprintf(log_file_ptr, "\t\t|\n");
+			fprintf(log_file_ptr, "\t\t--------------->LUX Infrared Light : %d\n",message.light.lux_irlight);
+			fprintf(log_file_ptr, "\t\t\t|\n");
+			fprintf(log_file_ptr, "\t\t\t--------------->Lumens : %f\n",message.light.lumen);
+		}
 	}
 
-	gettimeofday(&Now,NULL);
-	fprintf(log_file_ptr, "[%lu.%06lu] %s \n", Now.tv_sec,Now.tv_usec,message.str);	
 	fclose(log_file_ptr);
 }
 

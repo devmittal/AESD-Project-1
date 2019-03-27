@@ -44,7 +44,7 @@ temperature.o:	temperature.c temperature.h i2c.h
 lightSensor.o:	lightSensor.c lightSensor.h i2c.h
 		$(CC) -c src/lightSensor.c -lm
 
-message.o:	message.c message.h temperature.h
+message.o:	message.c message.h temperature.h lightSensor.h
 		$(CC) -c src/message.c -lrt
 
 logger.o:	logger.c logger.h
