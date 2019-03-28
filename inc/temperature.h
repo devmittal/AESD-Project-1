@@ -26,5 +26,15 @@ typedef struct Temperature
 enum Registor_Address{TEMPERATURE_REG, CONFIGURATION_REG, TLOW_REG, THIGH_REG};
 
 tempt_t read_temperature(void);
+float read_Tlow(void);
+float read_Thigh(void);
+uint16_t read_configuration_reg(void);
+void set_shutdown(void);
+void disable_shutdown(void);
+uint8_t read_fault(void);
+uint8_t read_em(void);
+void write_em(uint8_t em);
+uint8_t read_conversion_rate(void);
+void set_conversion_rate(uint8_t cr);
 
 #endif

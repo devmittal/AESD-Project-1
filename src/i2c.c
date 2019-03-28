@@ -77,8 +77,15 @@ uint8_t* read_i2c16(int fd)
 	int value = 0;
 	static uint8_t data[2] = {0};
 
+	value = read(fd, data, sizeof(data));
+	if (value != 2)
+	{
+		printf("\nvalue: %d",value);
+		perror("Error encountered while reading I2C - 16(2)");
+		exit(-1);
+	}
 	//pthread_mutex_lock(&i2c_bus_lock);
-	value = read(fd, &data[0], sizeof(data[0]));
+	/*value = read(fd, &data[0], sizeof(data[0]));
 	if (value != 1)
 	{
 		printf("\nvalue: %d",value);
@@ -93,7 +100,7 @@ uint8_t* read_i2c16(int fd)
 		perror("Error encountered while reading I2C - 16(2)");
 		exit(-1);
 	}
-
+*/
 	return data;
 }
 
@@ -108,6 +115,7 @@ uint8_t read_i2c8(int fd)
 
 	if (value != 1)
 	{
+		printf("\nvalue: %d",value);
 		perror("Error encountered while reading I2C - 8");
 		exit(-1);
 	}

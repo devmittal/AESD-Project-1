@@ -34,10 +34,23 @@ void kill_signal_handler(int signum)
 void temperature(void *tempeature_thread)
 {
 	mesg_t message;
+	/*printf("\nTLOW: %f",read_Tlow());
+	printf("\nTHIGH: %f",read_Thigh());
+	//set_shutdown();
+	//printf("\nConfig Reg: %X",read_configuration_reg());
+	//disable_shutdown();
+	//printf("\nConfig Reg: %X",read_configuration_reg());
+	write_em(1);
+	printf("\nEM Bits: %X",read_em());
+	printf("\nConfig Reg: %X",read_configuration_reg());
+	set_conversion_rate(3);
+	printf("\nCR Bits: %X",read_conversion_rate());
+	printf("\nConfig Reg: %X",read_configuration_reg());
+	printf("\n");*/
 
 	while(1)
 	{
-		usleep(5000);
+		usleep(50000);
 		message.temperature = read_temperature();
 		sprintf(message.str,"Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
 		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_TEMPERATURE, &message);
@@ -54,7 +67,7 @@ void light(void *light_thread)
 
 	while(1)
 	{
-		usleep(5000);
+		usleep(50000);
 		message.light = read_LightSensor();
 		if(message.light.isChange)
 		{
