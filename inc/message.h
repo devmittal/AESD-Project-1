@@ -21,6 +21,7 @@
 #include <stdint.h>
 #include <mqueue.h>
 #include <sys/stat.h>
+#include <signal.h>
 #include "temperature.h"
 #include "lightSensor.h"
 
@@ -37,6 +38,8 @@ typedef struct Message
 	light_t light;
 	char str[100];
 }mesg_t;
+
+mqd_t queue_fd;
 
 enum Message_Priority{PRIO_TEMPERATURE, PRIO_LIGHT};
 

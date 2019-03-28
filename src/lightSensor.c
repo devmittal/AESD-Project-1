@@ -20,6 +20,8 @@ void startup_test(void)
 	write_i2c(fd, CMD_ID_REGISTER);
 
 	id = read_i2c8(fd);
+	close_i2c(fd);
+
 	if(id == 0x50)
 	{
 		printf("\nLight sensor Functional");
@@ -28,10 +30,8 @@ void startup_test(void)
 	else
 	{
 		printf("\nLight sensor not functional");
-		/* print to log file */
+		/* print to log file. Handle case??? */
 	}
-
-	close_i2c(fd);
 }
 
 void power_up(void)
@@ -44,6 +44,8 @@ void power_up(void)
 	write_i2c(fd, CONTROL_REGISTER);
 
 	control_register_data = read_i2c8(fd);
+	close_i2c(fd);
+
 	if(control_register_data == 0x33)
 	{
 		printf("\nLight Sensor powered up");
@@ -52,10 +54,8 @@ void power_up(void)
 	else
 	{
 		printf("\nLight sensor not powered up! x_x");
-		/* print to log file */
+		/* print to log file. Handle case??? */
 	}
-
-	close_i2c(fd);
 }
 
 uint8_t read_control_register(void)
@@ -157,44 +157,46 @@ uint16_t* read_interrupt_threshold(void)
 
 	write_i2c(fd, CMD_INTERRUPT_THRESHOLD_REGISTER_HIGH);
 	interrupt_threshold_data = read_i2c16(fd);	
-	final_threshold[1] = (*(interrupt_threshold_data + 1) << 8) | *interrupt_threshold_data;
-
 	close_i2c(fd);
+
+	final_threshold[1] = (*(interrupt_threshold_data + 1) << 8) | *interrupt_threshold_data;
 
 	return final_threshold;
 }
 
 int read_visible_light(void)
 {
-	uint8_t* lux;
+	uint8_t lux_low, lux_high;
 	int final_lux;
 	int fd = 0;
 
 	fd = init_i2c(APDS_9301_DEV_ID);
 
-	write_i2c(fd, CMD_DATA0LOW_REGISTER_16);
-	lux = read_i2c16(fd);
-
+	write_i2c(fd, CMD_DATA0LOW_REGISTER_8);
+	lux_low = read_i2c8(fd);
+	write_i2c(fd, CMD_DATA0HIGH_REGISTER_8);
+	lux_high = read_i2c8(fd);
 	close_i2c(fd);
 
-	final_lux = (*(lux + 1) << 8) | *lux;
+	final_lux = (lux_high << 8) | lux_low;
 
 	return final_lux;
 }
 
 int read_IR_light(void)
 {
-	uint8_t* lux;
+	uint8_t lux_low, lux_high;
 	int final_lux;
 	int fd = 0;
 
 	fd = init_i2c(APDS_9301_DEV_ID);
-	write_i2c(fd, CMD_DATA1LOW_REGISTER_16);
-	lux = read_i2c16(fd);
-
+	write_i2c(fd, CMD_DATA1LOW_REGISTER_8);
+	lux_low = read_i2c8(fd);
+	write_i2c(fd, CMD_DATA1HIGH_REGISTER_8);
+	lux_high = read_i2c8(fd);
 	close_i2c(fd);
 
-	final_lux = (*(lux + 1) << 8) | *lux;
+	final_lux = (lux_high << 8) | lux_low;
 
 	return final_lux;
 }
@@ -203,7 +205,7 @@ double cal_lumen(int ch0, int ch1)
 {
 	double div_result, lux;
 
-	printf("\nch0: %d | ch1: %d",ch0,ch1);
+	printf("\nch0: %X | ch1: %X",ch0,ch1);
 	div_result = (double)ch1/(double)ch0;
 
 	if(div_result > 0 && div_result <= 0.50)

@@ -26,16 +26,16 @@ mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize)
 int send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* message)
 {
 	int value = 0;
-	mqd_t fd;
+	//mqd_t fd;
 
-	fd = open_MessageQueue(QueueName, QueueSize);
-	if(fd == -1)
+	//fd = open_MessageQueue(QueueName, QueueSize);
+/*	if(fd == -1)
 	{
-		perror("Failed to open message queue");
+		perror("Failed to open message queue - send");
 		exit(-1);
-	}
+	}*/
 
-	value = mq_send(fd, (char *)message, sizeof(mesg_t), priority);
+	value = mq_send(queue_fd, (char *)message, sizeof(mesg_t), priority);
 	if(value == -1)
 	{
 		perror("Failed to send message through message queue");
@@ -51,19 +51,19 @@ int recv_Message(char *QueueName, uint8_t QueueSize, uint8_t *priority, mesg_t* 
 {
 	int value = 0;
 	unsigned int prio;
-	mqd_t fd;
+/*	mqd_t fd;
 
 	fd = open_MessageQueue(QueueName, QueueSize);
 	if(fd == -1)
 	{
-		perror("Failed to open message queue");
+		perror("Failed to open message queue - receive");
 		exit(-1);
-	}
+	}*/
 
-	value = mq_receive(fd, (char *)message, sizeof(mesg_t), &prio);
+	value = mq_receive(queue_fd, (char *)message, sizeof(mesg_t), &prio);
 	*priority = prio;
 
-	CloseUnlinkQueue(fd, QueueName);
+	//CloseUnlinkQueue(fd, QueueName);
 
 	return value;
 }

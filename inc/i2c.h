@@ -17,13 +17,15 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <pthread.h>
+#include <semaphore.h>
 #include <sys/ioctl.h>
 #include <linux/i2c-dev.h>
 
 #define TMP102_DEV_ID		(0x48)
 #define APDS_9301_DEV_ID	(0x39)
 
-pthread_mutex_t i2c_bus_lock; /*Initialized and Destroyed in Main*/
+//pthread_mutex_t i2c_bus_lock; /*Initialized and Destroyed in Main*/
+sem_t i2c_bus_lock; /*Initialized and Destroyed in Main*/
 int I2C_FileDescriptor;
 
 int init_i2c(uint8_t DeviceID);

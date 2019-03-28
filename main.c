@@ -7,14 +7,13 @@
 ​ * ​ ​ @version​ ​ 		1.0
 *****************************************************************************/
 
-#include <pthread.h>
-
 #include "inc/i2c.h"
 #include "inc/logger.h"
 #include "inc/message.h"
 #include "inc/temperature.h"
 
 #define NUM_THREADS (3)
+pthread_t thread[NUM_THREADS];
 
 typedef struct my_thread
 {
@@ -22,13 +21,23 @@ typedef struct my_thread
 	char* log;
 }thread_t;
 
+void kill_signal_handler(int signum)
+{
+	int i;
+	if(signum == SIGINT)
+	{
+		for(i=0;i<NUM_THREADS;i++)
+			pthread_cancel(thread[i]);
+	}
+}
+
 void temperature(void *tempeature_thread)
 {
 	mesg_t message;
 
 	while(1)
 	{
-		usleep(50000);
+		usleep(5000);
 		message.temperature = read_temperature();
 		sprintf(message.str,"Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
 		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_TEMPERATURE, &message);
@@ -40,11 +49,12 @@ void light(void *light_thread)
 {
 	mesg_t message;
 
+	startup_test();
 	power_up();
 
 	while(1)
 	{
-		usleep(500000);
+		usleep(5000);
 		message.light = read_LightSensor();
 		if(message.light.isChange)
 		{
@@ -66,7 +76,16 @@ void logger(void *logger_thread)
 
 int main(int argc, char *argv[])
 {
-	pthread_t thread[NUM_THREADS];
+	struct sigaction act;
+
+	memset(&act,0,sizeof(struct sigaction));
+
+	act.sa_handler = &kill_signal_handler;
+	if(sigaction(SIGINT,&act,NULL) == -1)
+	{
+		perror("sigaction: ");
+		exit(-1);
+	}
 
 	thread_t *t_parent = NULL;
 	thread_t *t_temperature = NULL;
@@ -113,11 +132,19 @@ int main(int argc, char *argv[])
 	t_logger->id = thread_id_seed++;
 	t_logger->log = argv[1];
 
-	if(pthread_mutex_init(&i2c_bus_lock, NULL) != 0)
+	/*if(pthread_mutex_init(&i2c_bus_lock, NULL) != 0)
 	{
 		perror("\nI2C Bus Mutex initialization failed. Exiting \n");
 		exit(-1);
+	}*/
+
+	if(sem_init(&i2c_bus_lock, 0, 1) != 0)
+	{
+		perror("\nI2C Bus Semaphore initialization failed. Exiting \n");
+		exit(-1);	
 	}
+
+	queue_fd = open_MessageQueue(LOGGR_QNAME, LOGGR_QSIZE);
 
 	if(pthread_create(&thread[0], NULL, (void *)temperature, (void *)t_temperature))
 	{
@@ -142,7 +169,10 @@ int main(int argc, char *argv[])
 		pthread_join(thread[parser],NULL);
 	}
 
-	pthread_mutex_destroy(&i2c_bus_lock);
+	CloseUnlinkQueue(queue_fd, LOGGR_QNAME);
+
+	//pthread_mutex_destroy(&i2c_bus_lock);
+	sem_destroy(&i2c_bus_lock);
 
 	return 0;
 }
