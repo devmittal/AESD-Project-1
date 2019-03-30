@@ -13,6 +13,9 @@
 #include "inc/temperature.h"
 
 #define NUM_THREADS (3)
+
+enum LED_STATE{OFF, ON};
+
 pthread_t thread[NUM_THREADS];
 
 typedef struct my_thread
@@ -20,6 +23,15 @@ typedef struct my_thread
 	int id;
 	char* log;
 }thread_t;
+
+void led(uint8_t status)
+{
+	FILE FD_LED;
+
+	FD_LED = fopen("/sys/devices/platform/leds/leds/beaglebone:green:usr0/brightness", "w");
+	fprintf(FD_LED, "%d", status);
+	fclose(FD_LED);
+}
 
 void kill_signal_handler(int signum)
 {
