@@ -31,7 +31,8 @@ int write_log(int IsFileCreated, char * LogFilePath)
 		printf("PID = %d opened file in Write mode\n", getpid());
 
 		gettimeofday(&Now,NULL);
-		fprintf(log_file_ptr, "[%lu.%06lu] Logfile Create by Logger Thread (Thread ID  = %lu) \n", Now.tv_sec,Now.tv_usec,syscall(__NR_gettid));	
+		fprintf(log_file_ptr, "[%lu.%06lu] Logfile Created by Logger Thread. Startup Test successful (Thread ID  = %lu). \n"
+				, Now.tv_sec,Now.tv_usec,syscall(__NR_gettid));	
 	}
 	else
 	{
@@ -62,7 +63,7 @@ int write_log(int IsFileCreated, char * LogFilePath)
 			fprintf(log_file_ptr, "\t\t\t|\n");
 			fprintf(log_file_ptr, "\t\t\t--------------->In Kelvin : %f\n",message.temperature.kelvin);
 		}
-		else
+		else if(queue_priority == PRIO_LIGHT)
 		{
 			fprintf(log_file_ptr, "\t|\n");
 			if(message.light.isLight)

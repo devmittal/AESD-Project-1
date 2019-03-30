@@ -1,6 +1,16 @@
+/*****************************************************************************
+​ ​* ​ ​ @file​ ​  		remoteTask.c
+​ * ​ ​ @brief​ ​ 		Contains function definitions for the remote task.
+ *   @Comm Type 	I2C
+ *   @Tools_Used 	Compiler: ARM-LINUX-GCC; Board: BeagleBone Green
+​ * ​ ​ @Author(s)​  	​​Devansh Mittal, Souvik De
+​ * ​ ​ @Date​ ​​ 		March 30th, 2019
+​ * ​ ​ @version​ ​ 		1.0
+*****************************************************************************/
+
 #include "../inc/remoteTask.h"
 
-void init_socket()
+void init_socket(void)
 {
 	int socketfd, client_len, client_socketfd;;
 	struct sockaddr_in socket_str, client_addr;

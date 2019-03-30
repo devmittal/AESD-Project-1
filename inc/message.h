@@ -41,7 +41,8 @@ typedef struct Message
 
 mqd_t queue_fd;
 
-enum Message_Priority{PRIO_TEMPERATURE, PRIO_LIGHT};
+/* 3rd element is included to send only message without any data */
+enum Message_Priority{PRIO_TEMPERATURE, PRIO_LIGHT, PRIO_NODATA}; 
 
 mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize);
 int send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* message);

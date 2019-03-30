@@ -41,7 +41,7 @@ typedef struct Light
 	uint8_t isChange;
 }light_t;
 
-void startup_test(void);
+uint8_t startup_test(void);
 void power_up(void);
 uint8_t read_control_register(void);
 void set_timing_register(uint8_t integ, uint8_t gain);

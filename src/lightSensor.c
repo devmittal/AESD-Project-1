@@ -11,7 +11,7 @@
 
 #include "../inc/lightSensor.h"
 
-void startup_test(void)
+uint8_t startup_test(void)
 {
 	uint8_t id;
 	int fd = 0;
@@ -22,16 +22,7 @@ void startup_test(void)
 	id = read_i2c8(fd);
 	close_i2c(fd);
 
-	if(id == 0x50)
-	{
-		printf("\nLight sensor Functional");
-		/* print to log file */
-	}
-	else
-	{
-		printf("\nLight sensor not functional");
-		/* print to log file. Handle case??? */
-	}
+	return id;
 }
 
 void power_up(void)

@@ -48,6 +48,17 @@ void temperature(void *tempeature_thread)
 	printf("\nConfig Reg: %X",read_configuration_reg());
 	printf("\n");*/
 
+	/* startup test */
+	if(read_configuration_reg() == 0x60A0)
+	{
+		sprintf(message.str,"Temperature sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
+		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_NODATA, &message);
+	}
+	else
+	{
+		/* Handle error condition */
+	}
+
 	while(1)
 	{
 		usleep(50000);
@@ -62,7 +73,16 @@ void light(void *light_thread)
 {
 	mesg_t message;
 
-	startup_test();
+	if(startup_test() == 0x50)
+	{
+		sprintf(message.str,"Light sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
+		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_NODATA, &message);		
+	}
+	else
+	{
+		/* Handle error */
+	}
+
 	power_up();
 
 	while(1)
@@ -81,6 +101,7 @@ void logger(void *logger_thread)
 {
 	thread_t *logger = (thread_t*) logger_thread;
 	write_log(0, logger->log);
+
 	while(1)
 	{
 		write_log(1, logger->log);
