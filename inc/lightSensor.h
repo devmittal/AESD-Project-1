@@ -12,7 +12,6 @@
 *****************************************************************************/
 
 #include <math.h>
-#include <stdbool.h>
 #include "i2c.h"
 
 #define CMD_ID_REGISTER (0x8A)

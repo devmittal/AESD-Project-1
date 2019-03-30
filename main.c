@@ -14,6 +14,8 @@
 
 #define NUM_THREADS (3)
 uint8_t isKill = 0;
+
+enum LED_STATE{OFF, ON};
 pthread_t thread[NUM_THREADS];
 
 typedef struct my_thread
@@ -21,6 +23,18 @@ typedef struct my_thread
 	int id;
 	char* log;
 }thread_t;
+
+/*void led(uint8_t status)
+{
+	FILE *FD_LED;
+
+	FD_LED = fopen("/sys/devices/platform/leds/leds/beaglebone:green:usr1/brightness", "w");
+
+	if(FD_LED == NULL)
+		perror("LED file");
+	fprintf(FD_LED, "%d", status);
+	fclose(FD_LED);
+}*/
 
 void kill_signal_handler(int signum)
 {
@@ -55,9 +69,44 @@ void getSensorData(union sigval sv)
 	}
 }
 
+timer_t timer_init(int source)
+{
+	struct sigevent sev;
+	struct itimerspec trigger;
+	static timer_t timerid;
+	
+	memset(&sev,0,sizeof(struct sigevent));
+	memset(&trigger,0,sizeof(struct itimerspec));
+	
+	sev.sigev_notify = SIGEV_THREAD;
+	sev.sigev_notify_function = &getSensorData;
+
+	if(source == PRIO_TEMPERATURE)
+		sev.sigev_value.sival_ptr = (void *)PRIO_TEMPERATURE;	
+	else
+		sev.sigev_value.sival_ptr = (void *)PRIO_LIGHT;
+
+	if(timer_create(CLOCK_REALTIME, &sev, &timerid) == -1)
+	{
+		perror("Timer not created");
+		exit(-1);	
+	}
+	
+	trigger.it_value.tv_sec = 1;
+	trigger.it_interval.tv_sec = 1;
+	if(timer_settime(timerid,0,&trigger,NULL) == -1)
+	{
+		perror("Timer could not be set");
+		exit(-1);
+	}
+
+	return timerid;
+}
+
 void temperature(void *tempeature_thread)
 {
 	mesg_t message;
+	timer_t timerid_tmp;
 	/*printf("\nTLOW: %f",read_Tlow());
 	printf("\nTHIGH: %f",read_Thigh());
 	//set_shutdown();
@@ -83,32 +132,7 @@ void temperature(void *tempeature_thread)
 		/* Handle error condition */
 	}
 
-	struct sigevent sev;
-	struct itimerspec trigger;
-	static timer_t timerid;
-	
-	memset(&sev,0,sizeof(struct sigevent));
-	memset(&trigger,0,sizeof(struct itimerspec));
-	
-	sev.sigev_notify = SIGEV_THREAD;
-	sev.sigev_notify_function = &getSensorData;
-	sev.sigev_value.sival_ptr = (void *)PRIO_TEMPERATURE;	
-	
-	if(timer_create(CLOCK_REALTIME, &sev, &timerid) == -1)
-	{
-		perror("Timer not created");
-		exit(-1);	
-	}
-	
-	trigger.it_value.tv_sec = 1;
-	trigger.it_interval.tv_sec = 1;
-	if(timer_settime(timerid,0,&trigger,NULL) == -1)
-	{
-		perror("Timer could not be set");
-		exit(-1);
-	}
-
-	//timer_init_temperature();
+	timerid_tmp = timer_init(PRIO_TEMPERATURE);
 
 	while(1)
 	{
@@ -116,7 +140,7 @@ void temperature(void *tempeature_thread)
 			break;
 	}
 
-	if(timer_delete(timerid) == -1)
+	if(timer_delete(timerid_tmp) == -1)
 	{
 		perror("Timer not deleted");
 		exit(-1);
@@ -126,6 +150,7 @@ void temperature(void *tempeature_thread)
 void light(void *light_thread)
 {
 	mesg_t message;
+	timer_t timerid_light;
 
 	if(startup_test() == 0x50)
 	{
@@ -139,31 +164,7 @@ void light(void *light_thread)
 
 	power_up();
 
-	//timer_init_light();
-	struct sigevent sev;
-	struct itimerspec trigger;
-	static timer_t timerid;
-
-	memset(&sev,0,sizeof(struct sigevent));
-	memset(&trigger,0,sizeof(struct itimerspec));
-
-	sev.sigev_notify = SIGEV_THREAD;
-	sev.sigev_notify_function = &getSensorData;
-	sev.sigev_value.sival_ptr = (void *)PRIO_LIGHT;	
-
-	if(timer_create(CLOCK_REALTIME, &sev, &timerid) == -1)
-	{
-		perror("Timer not created");
-		exit(-1);	
-	}
-	
-	trigger.it_value.tv_sec = 1;
-	trigger.it_interval.tv_sec = 1;
-	if(timer_settime(timerid,0,&trigger,NULL) == -1)
-	{
-		perror("Timer could not be set");
-		exit(-1);
-	}
+	timerid_light = timer_init(PRIO_LIGHT);
 
 	while(1)
 	{
@@ -171,7 +172,7 @@ void light(void *light_thread)
 			break;
 	}
 
-	if(timer_delete(timerid) == -1)
+	if(timer_delete(timerid_light) == -1)
 	{
 		perror("Timer not deleted");
 		exit(-1);
@@ -202,6 +203,7 @@ int main(int argc, char *argv[])
 		exit(-1);
 	}
 
+	//led(0);
 	thread_t *t_parent = NULL;
 	thread_t *t_temperature = NULL;
 	thread_t *t_light = NULL;
