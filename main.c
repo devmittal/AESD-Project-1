@@ -13,6 +13,7 @@
 #include "inc/temperature.h"
 
 #define NUM_THREADS (3)
+uint8_t isKill = 0;
 pthread_t thread[NUM_THREADS];
 
 typedef struct my_thread
@@ -26,8 +27,31 @@ void kill_signal_handler(int signum)
 	int i;
 	if(signum == SIGINT)
 	{
-		for(i=0;i<NUM_THREADS;i++)
-			pthread_cancel(thread[i]);
+		isKill = 1;
+		pthread_cancel(thread[2]);
+	}
+}
+
+void getSensorData(union sigval sv)
+{
+	mesg_t message;
+	int *source = sv.sival_ptr;
+
+	if(source == (int *)PRIO_LIGHT)
+	{
+		message.light = read_LightSensor();
+		if(message.light.isChange)
+		{
+			sprintf(message.str,"Change in light state read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
+			send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_LIGHT , &message);		
+		}
+	}
+	else
+	{
+		message.temperature = read_temperature();
+		sprintf(message.str,"Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
+		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_TEMPERATURE, &message);
+		printf("\nTemperature = %f\n",read_temperature().celcius);
 	}
 }
 
@@ -59,13 +83,43 @@ void temperature(void *tempeature_thread)
 		/* Handle error condition */
 	}
 
+	struct sigevent sev;
+	struct itimerspec trigger;
+	static timer_t timerid;
+	
+	memset(&sev,0,sizeof(struct sigevent));
+	memset(&trigger,0,sizeof(struct itimerspec));
+	
+	sev.sigev_notify = SIGEV_THREAD;
+	sev.sigev_notify_function = &getSensorData;
+	sev.sigev_value.sival_ptr = (void *)PRIO_TEMPERATURE;	
+	
+	if(timer_create(CLOCK_REALTIME, &sev, &timerid) == -1)
+	{
+		perror("Timer not created");
+		exit(-1);	
+	}
+	
+	trigger.it_value.tv_sec = 1;
+	trigger.it_interval.tv_sec = 1;
+	if(timer_settime(timerid,0,&trigger,NULL) == -1)
+	{
+		perror("Timer could not be set");
+		exit(-1);
+	}
+
+	//timer_init_temperature();
+
 	while(1)
 	{
-		usleep(50000);
-		message.temperature = read_temperature();
-		sprintf(message.str,"Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
-		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_TEMPERATURE, &message);
-		printf("\nTemperature = %f\n",read_temperature().celcius);
+		if(isKill == 1)
+			break;
+	}
+
+	if(timer_delete(timerid) == -1)
+	{
+		perror("Timer not deleted");
+		exit(-1);
 	}
 }
 
@@ -85,15 +139,42 @@ void light(void *light_thread)
 
 	power_up();
 
+	//timer_init_light();
+	struct sigevent sev;
+	struct itimerspec trigger;
+	static timer_t timerid;
+
+	memset(&sev,0,sizeof(struct sigevent));
+	memset(&trigger,0,sizeof(struct itimerspec));
+
+	sev.sigev_notify = SIGEV_THREAD;
+	sev.sigev_notify_function = &getSensorData;
+	sev.sigev_value.sival_ptr = (void *)PRIO_LIGHT;	
+
+	if(timer_create(CLOCK_REALTIME, &sev, &timerid) == -1)
+	{
+		perror("Timer not created");
+		exit(-1);	
+	}
+	
+	trigger.it_value.tv_sec = 1;
+	trigger.it_interval.tv_sec = 1;
+	if(timer_settime(timerid,0,&trigger,NULL) == -1)
+	{
+		perror("Timer could not be set");
+		exit(-1);
+	}
+
 	while(1)
 	{
-		usleep(50000);
-		message.light = read_LightSensor();
-		if(message.light.isChange)
-		{
-			sprintf(message.str,"Change in light state read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
-			send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_LIGHT , &message);		
-		}
+		if(isKill == 1)
+			break;
+	}
+
+	if(timer_delete(timerid) == -1)
+	{
+		perror("Timer not deleted");
+		exit(-1);
 	}
 }
 
