@@ -15,8 +15,8 @@ else
 	CC=gcc
 endif
 
-OBJ_DEPS = main.o i2c.o temperature.o lightSensor.o message.o logger.o
-LIB_DEPS = i2c.h temperature.h lightSensor.h message.h logger.h
+OBJ_DEPS = main.o i2c.o temperature.o lightSensor.o message.o logger.o remoteTask.o
+LIB_DEPS = i2c.h temperature.h lightSensor.h message.h logger.h remoteTask.h
 
 all:		$(OBJ_DEPS)
 		$(CC) -o $(TARGET) $(OBJ_DEPS) -pthread -lrt -lm
@@ -49,6 +49,9 @@ message.o:	message.c message.h temperature.h lightSensor.h
 
 logger.o:	logger.c logger.h
 		$(CC) -c src/logger.c
+
+remoteTask.o:	remoteTask.c remoteTask.h
+			$(CC) -c src/remoteTask.c 
 	
 clean:
 		rm -f *.o
