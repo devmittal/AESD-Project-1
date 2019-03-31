@@ -20,6 +20,7 @@
 uint8_t isKill = 0;
 uint8_t IsTemptHeartAttack = 0;
 uint8_t IsLightHeartAttack = 0;
+uint8_t isTemperatureRequested = 0;
 
 pthread_t thread[NUM_THREADS];
 
@@ -76,6 +77,11 @@ void getSensorData(union sigval sv)
 			sprintf(message.str,"INFO : Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
 			send_Message(LOGGR_QNAME, PRIO_TEMPERATURE, &message);
 			send_Message(MAIN_QNAME, PRIO_TEMPERATURE, &message);
+			if(isTemperatureRequested)
+			{
+				send_Message(TEMPT_QNAME, PRIO_REMOTE, &message);
+				isTemperatureRequested = 0;
+			}
 			printf("\nTemperature = %f\n",read_temperature().celcius);
 		}
 	}
@@ -226,12 +232,13 @@ void logger(void *logger_thread)
 void remote(void *remote_thread)
 {
 	mesg_t message;
+	uint8_t queue_priority;
 
-	message.IsError = 0;
+	message.IsRemoteError = 0;
 
 	if(init_socket() < 0)
 	{
-		message.IsError = 1;
+		message.IsRemoteError = 1;
 		send_Message(MAIN_QNAME, PRIO_REMOTE, &message);
 	}
 
@@ -239,17 +246,30 @@ void remote(void *remote_thread)
 	{
 		if(read_data(&message) < 0)
 		{
-			message.IsError = 1;
+			message.IsRemoteError = 1;
 			send_Message(MAIN_QNAME, PRIO_REMOTE, &message);
 		}
-
-		if(strcmp(message.str, "temperature") == 0)
-		{
-			send_Message(TEMPT_QNAME, PRIO_REMOTE, &message);
-		}
 		else
-		{
+		{		
+			printf("\nSocket msg received: %s\n",message.str);
+			if(strcmp(message.str, "temperature") == 0)
+			{
+				isTemperatureRequested = 1;
+				if(recv_Message(TEMPT_QNAME, &queue_priority, &message) < 0)
+				{
+					message.IsRemoteError = 1;
+					send_Message(MAIN_QNAME, PRIO_REMOTE, &message);	
+				} 
+				else
+				{
+					if(send_data(&message) < 0)
+						printf("\nError in send data");
+				}
+			}
+			else
+			{
 
+			}
 		}
 	}
 

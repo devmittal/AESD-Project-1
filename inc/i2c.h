@@ -21,12 +21,17 @@
 #include <sys/ioctl.h>
 #include <linux/i2c-dev.h>
 
-#define TMP102_DEV_ID		(0x48)
-#define APDS_9301_DEV_ID	(0x39)
+#define TMP102_DEV_ID		(0x48) //Temperature sensor address
+#define APDS_9301_DEV_ID	(0x39) //Light sensor address
 
 sem_t i2c_bus_lock; /*Initialized and Destroyed in Main*/
 int I2C_FileDescriptor;
 
+/**
+* @Brief  This function initializes i2c communication
+* @Param  DeviceID: Sensor address
+* @Return 
+**/
 int init_i2c(uint8_t DeviceID);
 int write_i2c(int fd, uint8_t register_type);
 int write_i2c16(int fd, uint16_t register_type);

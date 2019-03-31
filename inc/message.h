@@ -22,6 +22,7 @@
 #include <mqueue.h>
 #include <sys/stat.h>
 #include <signal.h>
+#include <errno.h>
 #include "temperature.h"
 #include "lightSensor.h"
 
@@ -39,6 +40,7 @@ typedef struct Message
 	tempt_t temperature;
 	light_t light;
 	int IsLoggerError;
+	int IsRemoteError;
 	char str[100];
 }mesg_t;
 
@@ -53,6 +55,7 @@ enum Message_Priority{PRIO_TEMPERATURE, PRIO_LIGHT, PRIO_LOG, PRIO_NODATA, PRIO_
 
 void init_MessageQueues(void);
 void dest_MessageQueues(void);
+mqd_t open_MessageQueue_NonBlocking(char *QueueName, uint8_t QueueSize);
 mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize);
 void send_Message(char *QueueName, uint8_t priority, mesg_t* message);
 int recv_Message(char *QueueName, uint8_t *priority, mesg_t* message);
