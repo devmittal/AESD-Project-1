@@ -82,6 +82,8 @@ int main(void)
 		if(strcmp(request, "temperature") == 0)
 		{
 			sprintf(message.str,"temperature");
+			printf("\nRequest Type : %s\n",message.str);
+			
 			if(send_data(&message) < 0)
 			{
 				printf("Failed to send data to server. Exiting :(\n");
