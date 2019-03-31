@@ -17,7 +17,7 @@ tempt_t read_temperature(void)
 {
 	int fd = 0;
 	uint8_t data_low, data_high;
-	uint16_t temperature_hex = 0;
+	int16_t temperature_hex = 0;
 	tempt_t temperature;
 
 	fd = init_i2c(TMP102_DEV_ID);
@@ -55,7 +55,9 @@ tempt_t read_temperature(void)
 
 	temperature_hex = ((data_high << 8) | (data_low)) >> 4;
 
-	if(((temperature_hex & (0x0800)) >> 11))
+	cal_temp(temperature_hex,&temperature.celcius,&temperature.farenheit,&temperature.kelvin);
+
+	/*if(((temperature_hex & (0x0800)) >> 11))
 	{
 		temperature_hex ^= (0x0FFF);
 		temperature_hex += 1;
@@ -64,9 +66,23 @@ tempt_t read_temperature(void)
 
 	temperature.celcius = temperature_hex * SCALING_FACTOR;
 	temperature.farenheit = (temperature.celcius * 1.8) + 32;
-	temperature.kelvin = temperature.celcius + 273.15;
+	temperature.kelvin = temperature.celcius + 273.15;*/
 
 	return temperature;
+}
+
+void cal_temp(int16_t temperature_hex, float *celcius, float *farenheit, float *kelvin)
+{
+	if(((temperature_hex & (0x0800)) >> 11))
+	{
+		temperature_hex ^= (0x0FFF);
+		temperature_hex += 1;
+		temperature_hex = temperature_hex * (-1);
+	}
+
+	*celcius = temperature_hex * SCALING_FACTOR;
+	*farenheit = (*celcius * 1.8) + 32;
+	*kelvin = *celcius + 273.15;
 }
 
 float read_Tlow(void)

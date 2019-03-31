@@ -27,6 +27,7 @@ typedef struct Temperature
 enum Registor_Address{TEMPERATURE_REG, CONFIGURATION_REG, TLOW_REG, THIGH_REG};
 
 tempt_t read_temperature(void);
+void cal_temp(int16_t temperature_hex, float *celcius, float *farenheit, float *kelvin);
 float read_Tlow(void);
 float read_Thigh(void);
 uint16_t read_configuration_reg(void);
