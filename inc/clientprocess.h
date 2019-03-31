@@ -1,20 +1,21 @@
 /*****************************************************************************
-​ ​* ​ ​ @file​ ​  		remoteTask.h
-​ * ​ ​ @brief​ ​ 		Contains dependencies pertaining to remoteTask.c
- *   @Comm Type 	I2C
+​ ​* ​ ​ @file​ ​  		clientprocess.h
+​ * ​ ​ @brief​ ​ 		Contains dependencies pertaining to clientprocess.c
  *   @Tools_Used 	Compiler: ARM-LINUX-GCC; Board: BeagleBone Green
-​ * ​ ​ @Author(s)​  	​​Devansh Mittal, Souvik De
+​ * ​ ​ @Author(s)​  	​​Souvik De, Devansh Mittal
 ​ * ​ ​ @Date​ ​​ 		March 30th, 2019
 ​ * ​ ​ @version​ ​ 		1.0
 *****************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <strings.h>
+#include <string.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/time.h>
 #include <arpa/inet.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
-#include <netinet/ip.h>
+#include <sys/socket.h>
 #include "../inc/message.h"
 
 #define	PORT	(8800)

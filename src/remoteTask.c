@@ -9,41 +9,72 @@
 
 #include "../inc/remoteTask.h"
 
-void init_socket(void)
+int init_socket(void)
 {
-	int socketfd, client_len, client_socketfd;;
-	struct sockaddr_in socket_str, client_addr;
+	int server_FD;
+	struct sockaddr_in server_address;
+	int socket_attach_status;
+	int opt = 1;
+	int server_address_length = sizeof(server_address);
 
-	socketfd = socket(AF_INET, SOCK_STREAM, 0);
-	if(socketfd == -1)
+	server_FD = socket(AF_INET, SOCK_STREAM, 0);
+	if(server_FD == 0)
 	{
-		perror("Socket Creation failed: ");
-		exit(-1);
-	}
-
-	bzero((char *) &socket_str, sizeof(socket_str));
+		perror("Error while creating socket ");
+		return -1;
+    }
 	
-	socket_str.sin_family = AF_INET;
-	socket_str.sin_addr.s_addr = INADDR_ANY;
-	socket_str.sin_port = htons(PORTNO);
-
-	if(bind(socketfd, (struct sockaddr *) &socket_str, sizeof(socket_str)) == -1)
+	socket_attach_status = setsockopt(server_FD, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(opt));
+	if(socket_attach_status)
 	{
-		perror("Binding error: ");
-		exit(-1);
+		perror("Error in attaching socket to port");
+		return -1;
+    }
+
+	server_address.sin_family = AF_INET;
+    server_address.sin_addr.s_addr = INADDR_ANY;
+    server_address.sin_port = htons(PORT);
+	
+    if (bind(server_FD, (struct sockaddr *)&server_address, sizeof(server_address)) < 0)
+    {
+    	perror("Error while binding socket");
+    	return -1;
+    }
+
+   	if (listen(server_FD, 3) < 0)
+   	{
+   		perror("Error while listening");
+   		return -1;
+   	}
+
+   	new_socket_FD = accept(server_FD, (struct sockaddr *)&server_address, (socklen_t*)&server_address_length);
+    if (new_socket_FD < 0)
+    {
+    	perror("Error in accept");
+    	return -1;
+    }
+
+    return 0;	
+}
+
+int send_data(mesg_t *message)
+{
+	if(send(new_socket_FD , (void *)message, sizeof(mesg_t), 0) < 0)
+	{
+		perror("Error in send ");
+		return -1;
 	}
 
-	if(listen(socketfd,5) == -1)
+	return 0;
+}
+
+int read_data(mesg_t *message)
+{
+	if(read( new_socket_FD, message, sizeof(mesg_t)) < 0)
 	{
-		perror("Listening error: ");
-		exit(-1);
+		perror("Error in read data ");
+		return -1;
 	}
 
-	client_len = sizeof(client_addr);
-	client_socketfd = accept(socketfd, (struct sockaddr *) &client_addr, &client_len);
-	if(client_socketfd == -1)
-	{
-		perror("Client socket not received: ");
-		exit(-1);
-	}
+	return 0;
 }
