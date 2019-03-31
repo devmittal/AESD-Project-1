@@ -1,7 +1,6 @@
 /*****************************************************************************
 ​ ​* ​ ​ @file​ ​  		remoteTask.c
 ​ * ​ ​ @brief​ ​ 		Contains function definitions for the remote task.
- *   @Comm Type 	I2C
  *   @Tools_Used 	Compiler: ARM-LINUX-GCC; Board: BeagleBone Green
 ​ * ​ ​ @Author(s)​  	​​Devansh Mittal, Souvik De
 ​ * ​ ​ @Date​ ​​ 		March 30th, 2019

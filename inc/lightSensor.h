@@ -41,9 +41,9 @@ typedef struct Light
 }light_t;
 
 uint8_t startup_test(void);
-void power_up(void);
+uint8_t power_up(void);
 uint8_t read_control_register(void);
-void set_timing_register(uint8_t integ, uint8_t gain);
+uint8_t set_timing_register(uint8_t integ, uint8_t gain);
 uint8_t read_timing_register(void);
 void enable_interrupt(uint8_t interrupt_persist);
 void disable_interrupt(void);

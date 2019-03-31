@@ -25,7 +25,7 @@ uint8_t startup_test(void)
 	return id;
 }
 
-void power_up(void)
+uint8_t power_up(void)
 {
 	uint8_t control_register_data;
 	int fd = 0;
@@ -47,6 +47,8 @@ void power_up(void)
 		printf("\nLight sensor not powered up! x_x");
 		/* print to log file. Handle case??? */
 	}
+
+	return control_register_data;
 }
 
 uint8_t read_control_register(void)
@@ -63,7 +65,7 @@ uint8_t read_control_register(void)
 	return control_register_data;
 }
 
-void set_timing_register(uint8_t integ, uint8_t gain)
+uint8_t set_timing_register(uint8_t integ, uint8_t gain)
 {
 	int fd;
 	uint8_t timing_register_data;
@@ -78,6 +80,8 @@ void set_timing_register(uint8_t integ, uint8_t gain)
 	write_i2c(fd, new_timing_register_data);
 
 	close_i2c(fd);
+
+	return new_timing_register_data;
 }
 
 uint8_t read_timing_register(void)
