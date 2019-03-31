@@ -179,7 +179,18 @@ void logger(void *logger_thread)
 	}
 }
 
-int main(int argc, char *argv[])
+void check_heartbeat(void)
+{
+	uint8_t queue_priority;
+	mesg_t message;
+
+	while(1)
+	{
+		recv_Message(MAIN_QNAME, &queue_priority, &message);
+	}
+}
+
+void setup_signalhandler(void)
 {
 	struct sigaction act;
 
@@ -191,7 +202,10 @@ int main(int argc, char *argv[])
 		perror("sigaction: ");
 		exit(-1);
 	}
+}
 
+int main(int argc, char *argv[])
+{
 	led(ON);
 
 	thread_t *t_parent = NULL;
@@ -202,6 +216,8 @@ int main(int argc, char *argv[])
 	int thread_id_seed = 0;
 	int thread_status = 0;
 	int parser = 0;
+
+	setup_signalhandler();
 
 	t_parent = (thread_t*)malloc(sizeof(thread_t));
 	if(t_parent == NULL)
@@ -239,19 +255,13 @@ int main(int argc, char *argv[])
 	t_logger->id = thread_id_seed++;
 	t_logger->log = argv[1];
 
-	/*if(pthread_mutex_init(&i2c_bus_lock, NULL) != 0)
-	{
-		perror("\nI2C Bus Mutex initialization failed. Exiting \n");
-		exit(-1);
-	}*/
-
 	if(sem_init(&i2c_bus_lock, 0, 1) != 0)
 	{
 		perror("\nI2C Bus Semaphore initialization failed. Exiting \n");
 		exit(-1);	
 	}
 
-	queue_fd = open_MessageQueue(LOGGR_QNAME, LOGGR_QSIZE);
+	init_MessageQueues();
 
 	if(pthread_create(&thread[0], NULL, (void *)temperature, (void *)t_temperature))
 	{
@@ -276,9 +286,8 @@ int main(int argc, char *argv[])
 		pthread_join(thread[parser],NULL);
 	}
 
-	CloseUnlinkQueue(queue_fd, LOGGR_QNAME);
+	dest_MessageQueues();
 
-	//pthread_mutex_destroy(&i2c_bus_lock);
 	sem_destroy(&i2c_bus_lock);
 
 	led(OFF);

@@ -28,9 +28,11 @@
 #define TEMPT_QNAME	("/tempt_queue")
 #define LIGHT_QNAME	("/light_queue")
 #define	LOGGR_QNAME	("/logger_queue")
+#define	MAIN_QNAME	("/main_queue")
 #define	TEMPT_QSIZE	(8)
 #define	LIGHT_QSIZE	(8)
 #define	LOGGR_QSIZE	(8)
+#define	MAIN_QSIZE	(8)
 
 typedef struct Message
 {
@@ -40,13 +42,16 @@ typedef struct Message
 }mesg_t;
 
 mqd_t queue_fd;
+mqd_t main_queue_fd;
 
 /* 3rd element is included to send only message without any data */
-enum Message_Priority{PRIO_TEMPERATURE, PRIO_LIGHT, PRIO_NODATA}; 
+enum Message_Priority{PRIO_TEMPERATURE, PRIO_LIGHT, PRIO_NODATA};
 
+void init_MessageQueues(void);
+void dest_MessageQueues(void);
 mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize);
-int send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* message);
-int recv_Message(char *QueueName, uint8_t QueueSize, uint8_t *priority, mesg_t* message);
+void send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* message);
+void recv_Message(char *QueueName, uint8_t QueueSize, uint8_t *priority, mesg_t* message);
 void CloseUnlinkQueue(mqd_t fd, char* QueueName);
 
 #endif

@@ -10,6 +10,12 @@
 
 #include "../inc/message.h"
 
+void init_MessageQueues(void)
+{
+	main_queue_fd = open_MessageQueue(MAIN_QNAME, MAIN_QSIZE);
+	queue_fd = open_MessageQueue(LOGGR_QNAME, LOGGR_QSIZE);
+}
+
 mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize)
 {
 	mqd_t fd;
@@ -23,53 +29,75 @@ mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize)
 	return fd;
 }
 
-int send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* message)
+void send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* message)
 {
 	int value = 0;
-	//mqd_t fd;
 
-	//fd = open_MessageQueue(QueueName, QueueSize);
-/*	if(fd == -1)
+	if(strcmp(QueueName, LOGGR_QNAME) == 0)
 	{
-		perror("Failed to open message queue - send");
-		exit(-1);
-	}*/
-
-	value = mq_send(queue_fd, (char *)message, sizeof(mesg_t), priority);
-	if(value == -1)
-	{
-		perror("Failed to send message through message queue");
-		exit(-1);	
+		value = mq_send(queue_fd, (char *)message, sizeof(mesg_t), priority);
+		if(value == -1)
+		{
+			perror("Failed to send message through logger message queue ");
+			exit(-1);	
+		}
 	}
-
-	//CloseUnlinkQueue(fd, QueueName); //This is creating problem - closing queue before read can happen
-
-	return value;
+	else if(strcmp(QueueName, MAIN_QNAME) == 0)
+	{
+		value = mq_send(main_queue_fd, (char *)message, sizeof(mesg_t), priority);	
+		if(value == -1)
+		{
+				perror("Failed to send message through main message queue ");
+				exit(-1);	
+		}
+	}
+	else
+	{
+		printf("\nInvalid Queue Name in send !\n");
+		exit(-1);
+	}
 }
 
-int recv_Message(char *QueueName, uint8_t QueueSize, uint8_t *priority, mesg_t* message)
+void recv_Message(char *QueueName, uint8_t QueueSize, uint8_t *priority, mesg_t* message)
 {
 	int value = 0;
 	unsigned int prio;
-/*	mqd_t fd;
 
-	fd = open_MessageQueue(QueueName, QueueSize);
-	if(fd == -1)
+	if(strcmp(QueueName, LOGGR_QNAME) == 0)
 	{
-		perror("Failed to open message queue - receive");
+		value = mq_receive(queue_fd, (char *)message, sizeof(mesg_t), &prio);
+		if(value == -1)
+		{
+				perror("Failed to receive message through logger message queue ");
+				exit(-1);	
+		}
+		*priority = prio;
+	}
+	else if(strcmp(QueueName, MAIN_QNAME) == 0)
+	{
+		value = mq_receive(queue_fd, (char *)message, sizeof(mesg_t), &prio);
+		if(value == -1)
+		{
+				perror("Failed to receive message through main message queue ");
+				exit(-1);	
+		}
+		*priority = prio;
+	}
+	else
+	{
+		printf("\nInvalid Queue Name in receive !\n");
 		exit(-1);
-	}*/
-
-	value = mq_receive(queue_fd, (char *)message, sizeof(mesg_t), &prio);
-	*priority = prio;
-
-	//CloseUnlinkQueue(fd, QueueName);
-
-	return value;
+	}
 }
 
 void CloseUnlinkQueue(mqd_t fd, char* QueueName)
 {
 	mq_close(fd);
 	mq_unlink(QueueName);	
+}
+
+void dest_MessageQueues(void)
+{
+	CloseUnlinkQueue(main_queue_fd, MAIN_QNAME);
+	CloseUnlinkQueue(queue_fd, LOGGR_QNAME);
 }
