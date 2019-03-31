@@ -21,6 +21,7 @@ typedef struct Temperature
 	float celcius;
 	float farenheit;
 	float kelvin;
+	int IsError;
 }tempt_t;
 
 enum Registor_Address{TEMPERATURE_REG, CONFIGURATION_REG, TLOW_REG, THIGH_REG};

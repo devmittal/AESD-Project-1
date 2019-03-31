@@ -38,6 +38,7 @@ typedef struct Light
 	double lumen;
 	uint8_t isLight;
 	uint8_t isChange;
+	int IsError;
 }light_t;
 
 uint8_t startup_test(void);

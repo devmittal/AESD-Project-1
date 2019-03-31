@@ -166,12 +166,37 @@ int read_visible_light(void)
 	int fd = 0;
 
 	fd = init_i2c(APDS_9301_DEV_ID);
+	if(fd < 0)
+	{
+		return -1;
+	}
 
-	write_i2c(fd, CMD_DATA0LOW_REGISTER_8);
+	if(write_i2c(fd, CMD_DATA0LOW_REGISTER_8) < 0)
+	{
+		return -1;
+	}
+
 	lux_low = read_i2c8(fd);
-	write_i2c(fd, CMD_DATA0HIGH_REGISTER_8);
+	if(lux_low < 0)
+	{
+		return -1;
+	}
+
+	if(write_i2c(fd, CMD_DATA0HIGH_REGISTER_8) < 0)
+	{
+		return -1;
+	}
+
 	lux_high = read_i2c8(fd);
-	close_i2c(fd);
+	if(lux_high < 0)
+	{
+		return -1;
+	}
+
+	if(close_i2c(fd) < 0)
+	{
+		return -1;
+	}
 
 	final_lux = (lux_high << 8) | lux_low;
 
@@ -185,11 +210,37 @@ int read_IR_light(void)
 	int fd = 0;
 
 	fd = init_i2c(APDS_9301_DEV_ID);
-	write_i2c(fd, CMD_DATA1LOW_REGISTER_8);
+	if(fd < 0)
+	{
+		return -1;
+	}
+
+	if(write_i2c(fd, CMD_DATA1LOW_REGISTER_8) < 0)
+	{
+		return -1;
+	}
+
 	lux_low = read_i2c8(fd);
-	write_i2c(fd, CMD_DATA1HIGH_REGISTER_8);
+	if(lux_low < 0)
+	{
+		return -1;
+	}
+
+	if(write_i2c(fd, CMD_DATA1HIGH_REGISTER_8) < 0)
+	{
+		return -1;
+	}
+
 	lux_high = read_i2c8(fd);
-	close_i2c(fd);
+	if(lux_high < 0)
+	{
+		return -1;
+	}
+
+	if(close_i2c(fd) < 0)
+	{
+		return -1;
+	}
 
 	final_lux = (lux_high << 8) | lux_low;
 
@@ -256,8 +307,21 @@ uint8_t change(uint8_t isLight)
 light_t read_LightSensor(void)
 {
 	light_t light;
+	
 	light.lux_visiblelight = read_visible_light();
+	if(light.lux_visiblelight < 0)
+	{
+		light.IsError = 1;
+		return light;
+	}
+
 	light.lux_irlight = read_IR_light();
+	if(light.lux_irlight < 0)
+	{
+		light.IsError = 1;
+		return light;	
+	}
+
 	light.lumen = cal_lumen(light.lux_visiblelight, light.lux_irlight);
 	light.isLight = state(light.lumen);
 	light.isChange = change(light.isLight);

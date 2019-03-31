@@ -16,17 +16,42 @@
 tempt_t read_temperature(void)
 {
 	int fd = 0;
-	//uint8_t *data = 0;
 	uint8_t data_low, data_high;
 	uint16_t temperature_hex = 0;
 	tempt_t temperature;
 
 	fd = init_i2c(TMP102_DEV_ID);
-	WRITE_POINTER(fd, TEMPERATURE_REG);
-	//data = read_i2c16(fd);
+	if(fd < 0)
+	{
+		temperature.IsError = 1;
+		return temperature;
+	}
+
+	if(WRITE_POINTER(fd, TEMPERATURE_REG) < 0)
+	{
+		temperature.IsError = 1;
+		return temperature;
+	}
+	
 	data_high = read_i2c8(fd);
+	if(data_high < 0)
+	{
+		temperature.IsError = 1;
+		return temperature;
+	}
+
 	data_low = read_i2c8(fd);
-	close_i2c(fd);
+	if(data_low < 0)
+	{
+		temperature.IsError = 1;
+		return temperature;
+	}
+
+	if(close_i2c(fd) < 0)
+	{
+		temperature.IsError = 1;
+		return temperature;
+	}
 
 	temperature_hex = ((data_high << 8) | (data_low)) >> 4;
 
@@ -37,7 +62,6 @@ tempt_t read_temperature(void)
 		temperature.celcius = temperature_hex * (-1);
 	}
 
-	//temperature_hex = ((*data << 8) | *(data + 1)) >> 4;
 	temperature.celcius = temperature_hex * SCALING_FACTOR;
 	temperature.farenheit = (temperature.celcius * 1.8) + 32;
 	temperature.kelvin = temperature.celcius + 273.15;

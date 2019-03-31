@@ -38,6 +38,7 @@ typedef struct Message
 {
 	tempt_t temperature;
 	light_t light;
+	int IsLoggerError;
 	char str[100];
 }mesg_t;
 
@@ -45,13 +46,13 @@ mqd_t logger_queue_fd;
 mqd_t main_queue_fd;
 
 /* 3rd element is included to send only message without any data */
-enum Message_Priority{PRIO_TEMPERATURE, PRIO_LIGHT, PRIO_NODATA};
+enum Message_Priority{PRIO_TEMPERATURE, PRIO_LIGHT, PRIO_LOG, PRIO_NODATA};
 
 void init_MessageQueues(void);
 void dest_MessageQueues(void);
 mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize);
 void send_Message(char *QueueName, uint8_t priority, mesg_t* message);
-void recv_Message(char *QueueName, uint8_t *priority, mesg_t* message);
+int recv_Message(char *QueueName, uint8_t *priority, mesg_t* message);
 void CloseUnlinkQueue(mqd_t fd, char* QueueName);
 
 #endif

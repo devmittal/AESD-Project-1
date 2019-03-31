@@ -56,9 +56,10 @@ void send_Message(char *QueueName, uint8_t priority, mesg_t* message)
 		printf("\nInvalid Queue Name in send !\n");
 		exit(-1);
 	}
+	printf("\nSent with Priority : %d\n",priority);
 }
 
-void recv_Message(char *QueueName, uint8_t *priority, mesg_t* message)
+int recv_Message(char *QueueName, uint8_t *priority, mesg_t* message)
 {
 	int value = 0;
 	unsigned int prio;
@@ -69,7 +70,7 @@ void recv_Message(char *QueueName, uint8_t *priority, mesg_t* message)
 		if(value == -1)
 		{
 				perror("Failed to receive message through logger message queue ");
-				exit(-1);	
+				return value;	
 		}
 		*priority = prio;
 	}
@@ -79,15 +80,18 @@ void recv_Message(char *QueueName, uint8_t *priority, mesg_t* message)
 		if(value == -1)
 		{
 				perror("Failed to receive message through main message queue ");
-				exit(-1);	
+				return value;	
 		}
 		*priority = prio;
 	}
 	else
 	{
 		printf("\nInvalid Queue Name in receive !\n");
-		exit(-1);
+		return -1;
 	}
+	printf("\nReceived with priority :%d\n",prio);
+
+	return 0;
 }
 
 void CloseUnlinkQueue(mqd_t fd, char* QueueName)
