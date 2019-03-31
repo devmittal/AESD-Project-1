@@ -64,7 +64,45 @@ int read_data(mesg_t *message)
 
 int main(void)
 {
-	
+	char request[20] = {0};
+	int item = 0;
+	mesg_t message;
+
+	if(init_socket() < 0)
+	{
+		printf("Socket Initialization Failed! Exiting :(\n");
+		exit(-1);
+	}
+
+	while(1)
+	{
+		printf("Enter request type : ");
+		scanf("%s", request);	
+
+		if(strcmp(tolower(request), "temperature") == 0)
+		{
+			message.str
+		
+			if(send_data)
+
+			printf("Choose from the following temperature options :\n");
+			printf("1) Celsius\n");
+			printf("2) Farenheit\n");
+			printf("3) Kelvin\n\n");
+
+			printf("Option : ");
+			scanf("%d", item);	
+		}
+		else if(strcmp(tolower(request), "temperature") == 0)
+		{
+			printf("Choose from the following light options :\n");
+			printf("1) Lux Visible\n");
+			printf("2) Lux IR\n");
+			printf("3) Luminosity\n");
+			printf("4) Light State\n");
+		}
+	}
+
 	return 0;
 }
 

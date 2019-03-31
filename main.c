@@ -11,9 +11,10 @@
 #include "inc/i2c.h"
 #include "inc/logger.h"
 #include "inc/message.h"
+#include "inc/remoteTask.h"
 #include "inc/temperature.h"
 
-#define NUM_THREADS (3)
+#define NUM_THREADS (4)
 #define RECOVERY_DEADLINE (15)
 
 uint8_t isKill = 0;
@@ -222,6 +223,38 @@ void logger(void *logger_thread)
 
 }
 
+void remote(void *remote_thread)
+{
+	mesg_t message;
+
+	message.IsError = 0;
+
+	if(init_socket() < 0)
+	{
+		message.IsError = 1;
+		send_Message(MAIN_QNAME, PRIO_REMOTE, &message);
+	}
+
+	while(1)
+	{
+		if(read_data(&message) < 0)
+		{
+			message.IsError = 1;
+			send_Message(MAIN_QNAME, PRIO_REMOTE, &message);
+		}
+
+		if(strcmp(message.str, "temperature") == 0)
+		{
+			send_Message(TEMPT_QNAME, PRIO_REMOTE, &message);
+		}
+		else
+		{
+
+		}
+	}
+
+}
+
 void check_heartbeat(void)
 {
 	uint8_t queue_priority;
@@ -342,6 +375,7 @@ int main(int argc, char *argv[])
 	thread_t *t_temperature = NULL;
 	thread_t *t_light = NULL;
 	thread_t *t_logger = NULL;
+	thread_t *t_remote = NULL;
 
 	int thread_id_seed = 0;
 	int thread_status = 0;
@@ -385,6 +419,15 @@ int main(int argc, char *argv[])
 	t_logger->id = thread_id_seed++;
 	t_logger->log = argv[1];
 
+	t_remote = (thread_t*)malloc(sizeof(thread_t));
+	if(t_remote == NULL)
+	{
+		printf("\nMalloc for Remote Task Thread failed. Exiting\n");
+		return 0;
+	}
+	t_remote->id = thread_id_seed++;
+	t_remote->log = argv[1];
+
 	if(sem_init(&i2c_bus_lock, 0, 1) != 0)
 	{
 		perror("\nI2C Bus Semaphore initialization failed. Exiting \n");
@@ -408,6 +451,12 @@ int main(int argc, char *argv[])
 	if(pthread_create(&thread[2], NULL, (void *)logger, (void *)t_logger))
 	{
 		perror("\nError! Could not create logger thread: ");
+		exit(-1);
+	}
+
+	if(pthread_create(&thread[3], NULL, (void *)remote, (void *)t_remote))
+	{
+		perror("\nError! Could not create remote task thread: ");
 		exit(-1);
 	}
 

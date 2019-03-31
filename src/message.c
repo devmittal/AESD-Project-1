@@ -15,6 +15,8 @@ void init_MessageQueues(void)
 	isKillSignal = 0;
 	main_queue_fd = open_MessageQueue(MAIN_QNAME, MAIN_QSIZE);
 	logger_queue_fd = open_MessageQueue(LOGGR_QNAME, LOGGR_QSIZE);
+	tempt_queue_fd = open_MessageQueue(TEMPT_QNAME, TEMPT_QSIZE);
+	light_queue_fd = open_MessageQueue(LIGHT_QNAME, LIGHT_QSIZE);
 }
 
 mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize)
@@ -105,4 +107,6 @@ void dest_MessageQueues(void)
 {
 	CloseUnlinkQueue(main_queue_fd, MAIN_QNAME);
 	CloseUnlinkQueue(logger_queue_fd, LOGGR_QNAME);
+	CloseUnlinkQueue(tempt_queue_fd, TEMPT_QNAME);
+	CloseUnlinkQueue(light_queue_fd, LIGHT_QNAME);
 }
