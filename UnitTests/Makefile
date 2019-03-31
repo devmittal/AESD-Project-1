@@ -16,8 +16,10 @@ else
 	CC=gcc
 endif
 
-all: unit_test.o lightSensor.o i2c.o temperature.o logger.o message.o
-	  $(CC) -o $(TARGET) unit_test.o lightSensor.o i2c.o logger.o temperature.o message.o -pthread -lm
+OBJ_DEPS = unit_test.o lightSensor.o i2c.o temperature.o logger.o message.o
+
+all: $(OBJ_DEPS)
+	  $(CC) -o $(TARGET) $(OBJ_DEPS) -pthread -lm
 
 ifeq ($(PLATFORM),BBG)
 	scp $(TARGET) root@10.0.0.219:/usr/bin
