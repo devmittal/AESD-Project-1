@@ -7,15 +7,16 @@
 ​ * ​ ​ @version​ ​ 		1.0
 *****************************************************************************/
 
+#include "inc/led.h"
 #include "inc/i2c.h"
 #include "inc/logger.h"
 #include "inc/message.h"
 #include "inc/temperature.h"
 
 #define NUM_THREADS (3)
+
 uint8_t isKill = 0;
 
-enum LED_STATE{OFF, ON};
 pthread_t thread[NUM_THREADS];
 
 typedef struct my_thread
@@ -23,18 +24,6 @@ typedef struct my_thread
 	int id;
 	char* log;
 }thread_t;
-
-/*void led(uint8_t status)
-{
-	FILE *FD_LED;
-
-	FD_LED = fopen("/sys/devices/platform/leds/leds/beaglebone:green:usr1/brightness", "w");
-
-	if(FD_LED == NULL)
-		perror("LED file");
-	fprintf(FD_LED, "%d", status);
-	fclose(FD_LED);
-}*/
 
 void kill_signal_handler(int signum)
 {
@@ -203,7 +192,8 @@ int main(int argc, char *argv[])
 		exit(-1);
 	}
 
-	//led(0);
+	led(ON);
+
 	thread_t *t_parent = NULL;
 	thread_t *t_temperature = NULL;
 	thread_t *t_light = NULL;
@@ -290,6 +280,8 @@ int main(int argc, char *argv[])
 
 	//pthread_mutex_destroy(&i2c_bus_lock);
 	sem_destroy(&i2c_bus_lock);
+
+	led(OFF);
 
 	return 0;
 }
