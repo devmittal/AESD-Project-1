@@ -72,4 +72,5 @@ clientprocess.o: clientprocess.c clientprocess.h message.h
 clean:
 		rm -f *.o
 		rm -f proj
+		rm -f clientprocess
 

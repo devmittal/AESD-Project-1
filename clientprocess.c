@@ -79,11 +79,20 @@ int main(void)
 		printf("Enter request type : ");
 		scanf("%s", request);	
 
-		if(strcmp(tolower(request), "temperature") == 0)
+		if(strcmp(request, "temperature") == 0)
 		{
-			message.str
-		
-			if(send_data)
+			sprintf(message.str,"temperature");
+			if(send_data(&message) < 0)
+			{
+				printf("Failed to send data to server. Exiting :(\n");
+				exit(-1);
+			}
+
+			if(read_data(&message) < 0)
+			{
+				printf("Failed to read data from server. Exiting :(\n");
+				exit(-1);
+			}
 
 			printf("Choose from the following temperature options :\n");
 			printf("1) Celsius\n");
@@ -91,15 +100,69 @@ int main(void)
 			printf("3) Kelvin\n\n");
 
 			printf("Option : ");
-			scanf("%d", item);	
+			scanf("%d", item);
+
+			switch(item)
+			{
+				case 1:	printf("Temperature in Celsuis = %f\n", message.temperature.celcius);
+						break;
+
+				case 2:	printf("Temperature in Farenheit = %f\n", message.temperature.farenheit);
+						break;
+
+				case 3:	printf("Temperature in Kelvin = %f\n", message.temperature.kelvin);
+						break;
+
+				default: printf("Invalid Item Number ! Try again\n");
+			}	
 		}
-		else if(strcmp(tolower(request), "temperature") == 0)
+		else if(strcmp(request, "light") == 0)
 		{
+			sprintf(message.str,"light");
+			if(send_data(&message) < 0)
+			{
+				printf("Failed to send data to server. Exiting :(\n");
+				exit(-1);
+			}
+
+			if(read_data(&message) < 0)
+			{
+				printf("Failed to read data from server. Exiting :(\n");
+				exit(-1);
+			}
+
 			printf("Choose from the following light options :\n");
 			printf("1) Lux Visible\n");
 			printf("2) Lux IR\n");
 			printf("3) Luminosity\n");
-			printf("4) Light State\n");
+			printf("4) Light State\n\n");
+
+			printf("Option : ");
+			scanf("%d", item);
+
+			switch(item)
+			{
+				case 1:	printf("Lux Visible Light = %d\n", message.light.lux_visiblelight);
+						break;
+
+				case 2:	printf("Lux IR Light = %d\n", message.light.lux_irlight);
+						break;
+
+				case 3:	printf("Luminosity = %d\n", message.light.lumen);
+						break;
+
+				case 4:	if(message.light.isLight)
+							printf("Light State = Light\n");
+						else
+							printf("Light State = Dark\n");
+						break;
+
+				default: printf("Invalid Item Number ! Try again\n");
+			}	
+		}
+		else
+		{
+			printf("Invalid request! Try again.\n");
 		}
 	}
 
