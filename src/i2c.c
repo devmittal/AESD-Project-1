@@ -59,7 +59,7 @@ uint8_t write_i2c(int fd, uint8_t register_type)
 uint8_t write_i2c16(int fd, uint16_t register_type)
 {
 	int value = 0;
-
+	printf("Check: %d",register_type);
 	//pthread_mutex_lock(&i2c_bus_lock);
 	value = write(fd, &register_type, sizeof(register_type));
 	//pthread_mutex_unlock(&i2c_bus_lock);
@@ -80,7 +80,6 @@ uint8_t* read_i2c16(int fd)
 	value = read(fd, data, sizeof(data));
 	if (value != 2)
 	{
-		printf("\nvalue: %d",value);
 		perror("Error encountered while reading I2C - 16(2)");
 		exit(-1);
 	}

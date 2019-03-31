@@ -200,7 +200,7 @@ double cal_lumen(int ch0, int ch1)
 {
 	double div_result, lux;
 
-	printf("\nch0: %X | ch1: %X",ch0,ch1);
+	printf("\nch0: %d | ch1: %d",ch0,ch1);
 	div_result = (double)ch1/(double)ch0;
 
 	if(div_result > 0 && div_result <= 0.50)
