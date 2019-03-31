@@ -54,7 +54,25 @@ void send_Message(char *QueueName, uint8_t priority, mesg_t* message)
 			exit(-1);	
 		}
 	}
-	else
+	else if(strcmp(QueueName, TEMPT_QNAME) == 0)
+	{
+		value = mq_send(tempt_queue_fd, (char *)message, sizeof(mesg_t), priority);	
+		if(value == -1)
+		{
+			perror("Failed to send message through temperature message queue ");
+			exit(-1);	
+		}
+	}
+	else if(strcmp(QueueName, LIGHT_QNAME) == 0)
+	{
+		value = mq_send(light_queue_fd, (char *)message, sizeof(mesg_t), priority);	
+		if(value == -1)
+		{
+			perror("Failed to send message through light message queue ");
+			exit(-1);	
+		}
+	}
+	else	
 	{
 		printf("\nInvalid Queue Name in send !\n");
 		exit(-1);
@@ -84,6 +102,26 @@ int recv_Message(char *QueueName, uint8_t *priority, mesg_t* message)
 			if(!isKillSignal)
 				perror("Failed to receive message through main message queue ");
 			
+			return value;	
+		}
+		*priority = prio;
+	}
+	else if(strcmp(QueueName, TEMPT_QNAME) == 0)
+	{
+		value = mq_receive(tempt_queue_fd, (char *)message, sizeof(mesg_t), &prio);
+		if(value == -1)
+		{
+			perror("Failed to receive message through temperature message queue ");
+			return value;	
+		}
+		*priority = prio;
+	}
+	else if(strcmp(QueueName, LIGHT_QNAME) == 0)
+	{
+		value = mq_receive(light_queue_fd, (char *)message, sizeof(mesg_t), &prio);
+		if(value == -1)
+		{
+			perror("Failed to receive message through light message queue ");
 			return value;	
 		}
 		*priority = prio;
