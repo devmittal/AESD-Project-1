@@ -14,9 +14,11 @@
 #include "inc/temperature.h"
 
 #define NUM_THREADS (3)
-#define RECOVERY_DEADLINE (5)
+#define RECOVERY_DEADLINE (15)
 
 uint8_t isKill = 0;
+uint8_t IsTemptHeartAttack = 0;
+uint8_t IsLightHeartAttack = 0;
 
 pthread_t thread[NUM_THREADS];
 
@@ -32,6 +34,7 @@ void kill_signal_handler(int signum)
 	if(signum == SIGINT)
 	{
 		isKill = 1;
+		fclose(log_file_ptr);
 		pthread_cancel(thread[2]);
 	}
 }
@@ -53,9 +56,10 @@ void getSensorData(union sigval sv)
 			if(message.light.isChange)
 			{
 				sprintf(message.str,"Change in light state read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
-				send_Message(LOGGR_QNAME, PRIO_LIGHT , &message);	
-				send_Message(MAIN_QNAME, PRIO_LIGHT , &message);	
+				send_Message(LOGGR_QNAME, PRIO_LIGHT , &message);		
 			}
+
+			send_Message(MAIN_QNAME, PRIO_LIGHT , &message);
 		}
 	}
 	else if(source == (int *)PRIO_TEMPERATURE)
@@ -119,6 +123,8 @@ void temperature(void *tempeature_thread)
 	mesg_t message;
 	timer_t timerid_tmp;
 
+	message.temperature.IsError = 0;
+
 	/*printf("\nTLOW: %f",read_Tlow());
 	printf("\nTHIGH: %f",read_Thigh());
 	//set_shutdown();
@@ -137,18 +143,19 @@ void temperature(void *tempeature_thread)
 	if(read_configuration_reg() == 0x60A0)
 	{
 		sprintf(message.str,"Temperature sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
-	//	send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
+		send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 	}
 	else
 	{
-		/* Handle error condition */
+		message.temperature.IsError = 1;
+		send_Message(MAIN_QNAME, PRIO_TEMPERATURE, &message);
 	}
 
 	timerid_tmp = timer_init(PRIO_TEMPERATURE, 1, &getSensorData);
 
 	while(1)
 	{
-		if(isKill == 1)
+		if(isKill || IsTemptHeartAttack)  
 			break;
 	}
 
@@ -164,23 +171,30 @@ void light(void *light_thread)
 	mesg_t message;
 	timer_t timerid_light;
 
+	message.light.IsError = 0;
+
 	if(startup_test() == 0x50)
 	{
 		sprintf(message.str,"Light sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
-	//	send_Message(LOGGR_QNAME, PRIO_NODATA, &message);		
+		send_Message(LOGGR_QNAME, PRIO_NODATA, &message);		
 	}
 	else
 	{
-		/* Handle error */
+		message.light.IsError = 1;
+		send_Message(MAIN_QNAME, PRIO_LIGHT , &message);
 	}
 
-	power_up();
+	if(power_up() < 0)
+	{
+		message.light.IsError = 1;
+		send_Message(MAIN_QNAME, PRIO_LIGHT , &message);
+	}
 
 	timerid_light = timer_init(PRIO_LIGHT, 1, &getSensorData);
 
 	while(1)
 	{
-		if(isKill == 1)
+		if(isKill || IsLightHeartAttack)
 			break;
 	}
 
@@ -197,13 +211,11 @@ void logger(void *logger_thread)
 	mesg_t message;
 
 	message.IsLoggerError = write_log(0, logger->log);
-	printf("\nLogger Error = %d and PRIO_LOG = %d\n",message.IsLoggerError, PRIO_LOG );
 	send_Message(MAIN_QNAME, PRIO_LOG, &message);
 
 	while(1)
 	{
 		message.IsLoggerError = write_log(1, logger->log);
-		printf("\nLogger Error = %d and PRIO_LOG = %d\n",message.IsLoggerError, PRIO_LOG );
 		send_Message(MAIN_QNAME, PRIO_LOG, &message);
 	}
 
@@ -212,7 +224,8 @@ void logger(void *logger_thread)
 void check_heartbeat(void)
 {
 	uint8_t queue_priority;
-	uint32_t timetracker = 0;
+	uint32_t lighttimetracker = 0;
+	uint32_t tempttimetracker = 0;
 	uint32_t light_recoverytimeout = 0;
 	uint32_t tempt_recoverytimeout = 0;
 	mesg_t heartbeatmessage;
@@ -220,66 +233,80 @@ void check_heartbeat(void)
 
 	while(1)
 	{
+		if(isKill)
+		{
+			break;
+		}
+
 		recv_Message(MAIN_QNAME, &queue_priority, &heartbeatmessage);
-		printf("\nHello from check_heartbeat : %d\n",queue_priority);
 
 		if(queue_priority == PRIO_LIGHT)
 		{
 			if(heartbeatmessage.light.IsError)
 			{
 				led(ON);
-				sprintf(message.str,"Heart Beat Alert : Error encountered in Light Thread");
-			//	send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
+				sprintf(message.str,"Heart Beat Error : Error encountered in Light Thread");
+				send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 
 				light_recoverytimeout++;
 				if(light_recoverytimeout >= RECOVERY_DEADLINE)
 				{
-					pthread_cancel(thread[1]);
+					sprintf(message.str,"Heart Beat Alert : Light Thread cannot be recovered, Killing thread :(");
+					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);					
+					IsLightHeartAttack = 1;
 				}
 			}
 			else
 			{
-				if((timetracker % 10) == 0)
+				light_recoverytimeout = 0;
+				if(lighttimetracker >= 10)
 				{
+					lighttimetracker = 0;
 					led(OFF);
-					sprintf(message.str,"Heart Beat Alert : Light Thread working fine");
-				//	send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
+					sprintf(message.str,"Heart Beat Info : Light Thread working fine");
+					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 				}
 			}
 		}
-		else if(queue_priority == PRIO_TEMPERATURE)
+
+		if(queue_priority == PRIO_TEMPERATURE)
 		{
 			if(heartbeatmessage.temperature.IsError)
 			{
 				led(ON);
-				sprintf(message.str,"Heart Beat Alert : Error encountered in Temperature Thread");
-			//	send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
+				sprintf(message.str,"Heart Beat Error : Error encountered in Temperature Thread");
+				send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 
 				tempt_recoverytimeout++;
 				if(tempt_recoverytimeout >= RECOVERY_DEADLINE)
 				{
-					pthread_cancel(thread[0]);
+					sprintf(message.str,"Heart Beat Alert : Temperature Thread cannot be recovered, Killing thread :(");
+					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);					
+					IsTemptHeartAttack = 1;
 				}
 			}
 			else
 			{
-				if((timetracker % 10) == 0)
+				tempt_recoverytimeout = 0;
+				if(tempttimetracker >= 10)
 				{
+					tempttimetracker = 0;
 					led(OFF);
-					sprintf(message.str,"Heart Beat Alert : Temperature Thread working fine");
-				//	send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
+					sprintf(message.str,"Heart Beat Info : Temperature Thread working fine");
+					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 				}
 			}
 		}
-		else if(queue_priority == PRIO_LOG)
+
+		if(queue_priority == PRIO_LOG)
 		{
-			printf("\nHeart Beat Alert : Error Encountered in Logger Thread\n");
 			if(heartbeatmessage.IsLoggerError < 0)
 			{
 				led(ON);
-				printf("\nHeart Beat Alert : Error Encountered in Logger Thread\n");
+				printf("\nHeart Beat Alert : Error Encountered in Logger Thread, Killing Program NOoooo :(\n");
 				pthread_cancel(thread[2]);
 				isKill = 1;
+				break;
 			}
 		}
 		else
@@ -287,7 +314,8 @@ void check_heartbeat(void)
 			/* Check for Remote Task */
 		}
 
-		timetracker++;
+		lighttimetracker++;
+		tempttimetracker++;
 	}
 }
 
@@ -317,8 +345,6 @@ int main(int argc, char *argv[])
 	int thread_id_seed = 0;
 	int thread_status = 0;
 	int parser = 0;
-
-	printf("\nTEMP : %d\nLIGHT: %d\nLOG : %d\nNO : %d\n",PRIO_TEMPERATURE, PRIO_LIGHT, PRIO_LOG, PRIO_NODATA );
 
 	setup_signalhandler();
 

@@ -12,8 +12,11 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
+#include <stdio.h>
 #include <sys/time.h>
 #include<sys/syscall.h>
+
+FILE *log_file_ptr;
 
 int write_log(int IsFileCreated, char *LogFilePath);
 

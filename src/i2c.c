@@ -17,19 +17,26 @@ int init_i2c(uint8_t DeviceID)
 	I2C_FileDescriptor = 0;
 
 	sem_wait(&i2c_bus_lock);
-
+	
 	I2C_FileDescriptor = open(FD_I2C, O_RDWR);
 	if(I2C_FileDescriptor < 0) 
 	{
 		perror("Error encountered while opening I2C File Descriptor");
+		sem_post(&i2c_bus_lock);
+		return I2C_FileDescriptor;
 	}
 
 	if(ioctl(I2C_FileDescriptor, I2C_SLAVE, DeviceID) < 0) 
 	{
 		if(DeviceID == TMP102_DEV_ID)
+		{
 			perror("Error encountered while initializing temperature sensor");
+		}
 		else
+		{
 			perror("Error encountered while initializing light sensor");
+		}
+		sem_post(&i2c_bus_lock);
 	}
 
 	return I2C_FileDescriptor;
@@ -43,6 +50,7 @@ int write_i2c(int fd, uint8_t register_type)
 	if (value < 0)
 	{
 		perror("Error encountered in I2C write");
+		sem_post(&i2c_bus_lock);
 	}
 
 	return value;
@@ -56,6 +64,7 @@ int write_i2c16(int fd, uint16_t register_type)
 	if (value < 0)
 	{
 		perror("Error encountered in I2C write - 16");
+		sem_post(&i2c_bus_lock);
 	}
 
 	return value;
@@ -70,6 +79,7 @@ uint8_t* read_i2c16(int fd)
 	if (value != 2)
 	{
 		perror("Error encountered while reading I2C - 16(2)");
+		sem_post(&i2c_bus_lock);
 		return NULL;
 	}
 
@@ -85,6 +95,7 @@ int read_i2c8(int fd)
 	if (value != 1)
 	{
 		perror("Error encountered while reading I2C - 8");
+		sem_post(&i2c_bus_lock);
 		return -1;
 	}
 

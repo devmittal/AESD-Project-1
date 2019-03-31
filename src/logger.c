@@ -15,7 +15,6 @@ int write_log(int IsFileCreated, char * LogFilePath)
 {
 	int value = 0;
 	uint8_t queue_priority;
-	FILE *log_file_ptr;
 	mesg_t message;
 
 	struct timeval Now;
@@ -69,7 +68,7 @@ int write_log(int IsFileCreated, char * LogFilePath)
 				fprintf(log_file_ptr, "\t--------------->State : Light\n");
 			else
 				fprintf(log_file_ptr, "\t--------------->State : Dark\n");
-			fprintf(log_file_ptr, "\t|\t\n");
+			fprintf(log_file_ptr, "\t\t|\n");
 			fprintf(log_file_ptr, "\t\t--------------->LUX Visible Light : %d\n",message.light.lux_visiblelight);
 			fprintf(log_file_ptr, "\t\t\t|\n");
 			fprintf(log_file_ptr, "\t\t\t--------------->LUX Infrared Light : %d\n",message.light.lux_irlight);

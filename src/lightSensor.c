@@ -11,31 +11,67 @@
 
 #include "../inc/lightSensor.h"
 
-uint8_t startup_test(void)
+int startup_test(void)
 {
-	uint8_t id;
+	int id;
 	int fd = 0;
 
 	fd = init_i2c(APDS_9301_DEV_ID);
-	write_i2c(fd, CMD_ID_REGISTER);
+	if(fd < 0)
+	{
+		return -1;
+	}
+
+	if(write_i2c(fd, CMD_ID_REGISTER) < 0)
+	{
+		return -1;
+	}
 
 	id = read_i2c8(fd);
-	close_i2c(fd);
+	if(id < 0)
+	{
+		return -1;
+	}
+
+	if(close_i2c(fd) < 0)
+	{
+		return -1;
+	}
 
 	return id;
 }
 
-uint8_t power_up(void)
+int power_up(void)
 {
-	uint8_t control_register_data;
+	int control_register_data;
 	int fd = 0;
 
 	fd = init_i2c(APDS_9301_DEV_ID);
-	write_i2c(fd, CMD_CONTROL_REGISTER);
-	write_i2c(fd, CONTROL_REGISTER);
+	if(fd < 0)
+	{
+		return -1;
+	}
+
+	if(write_i2c(fd, CMD_CONTROL_REGISTER) < 0)
+	{
+		return -1;
+	}
+
+	if(write_i2c(fd, CONTROL_REGISTER) < 0)
+	{
+		return -1;
+	}
 
 	control_register_data = read_i2c8(fd);
-	close_i2c(fd);
+	if(control_register_data < 0)
+	{
+		return -1;
+	}
+
+	if(close_i2c(fd) < 0)
+	{
+		return -1;
+	}
 
 	if(control_register_data == 0x33)
 	{
@@ -307,7 +343,9 @@ uint8_t change(uint8_t isLight)
 light_t read_LightSensor(void)
 {
 	light_t light;
-	
+
+	light.IsError = 0;
+
 	light.lux_visiblelight = read_visible_light();
 	if(light.lux_visiblelight < 0)
 	{

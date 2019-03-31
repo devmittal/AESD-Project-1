@@ -56,7 +56,6 @@ void send_Message(char *QueueName, uint8_t priority, mesg_t* message)
 		printf("\nInvalid Queue Name in send !\n");
 		exit(-1);
 	}
-	printf("\nSent with Priority : %d\n",priority);
 }
 
 int recv_Message(char *QueueName, uint8_t *priority, mesg_t* message)
@@ -76,7 +75,7 @@ int recv_Message(char *QueueName, uint8_t *priority, mesg_t* message)
 	}
 	else if(strcmp(QueueName, MAIN_QNAME) == 0)
 	{
-		value = mq_receive(logger_queue_fd, (char *)message, sizeof(mesg_t), &prio);
+		value = mq_receive(main_queue_fd, (char *)message, sizeof(mesg_t), &prio);
 		if(value == -1)
 		{
 				perror("Failed to receive message through main message queue ");
@@ -89,7 +88,6 @@ int recv_Message(char *QueueName, uint8_t *priority, mesg_t* message)
 		printf("\nInvalid Queue Name in receive !\n");
 		return -1;
 	}
-	printf("\nReceived with priority :%d\n",prio);
 
 	return 0;
 }

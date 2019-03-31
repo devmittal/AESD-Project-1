@@ -20,6 +20,8 @@ tempt_t read_temperature(void)
 	int16_t temperature_hex = 0;
 	tempt_t temperature;
 
+	temperature.IsError = 0;
+
 	fd = init_i2c(TMP102_DEV_ID);
 	if(fd < 0)
 	{
@@ -56,17 +58,6 @@ tempt_t read_temperature(void)
 	temperature_hex = ((data_high << 8) | (data_low)) >> 4;
 
 	cal_temp(temperature_hex,&temperature.celcius,&temperature.farenheit,&temperature.kelvin);
-
-	/*if(((temperature_hex & (0x0800)) >> 11))
-	{
-		temperature_hex ^= (0x0FFF);
-		temperature_hex += 1;
-		temperature.celcius = temperature_hex * (-1);
-	}
-
-	temperature.celcius = temperature_hex * SCALING_FACTOR;
-	temperature.farenheit = (temperature.celcius * 1.8) + 32;
-	temperature.kelvin = temperature.celcius + 273.15;*/
 
 	return temperature;
 }
@@ -121,16 +112,33 @@ float read_Thigh(void)
 	return thigh_celsius;
 }
 
-uint16_t read_configuration_reg(void)
+int read_configuration_reg(void)
 {
 	int fd = 0;
 	uint8_t *data = 0;
 	uint16_t configuration_reg_data;
 
 	fd = init_i2c(TMP102_DEV_ID);
-	WRITE_POINTER(fd, CONFIGURATION_REG);
+	if(fd < 0)
+	{
+		return -1;
+	}
+
+	if(WRITE_POINTER(fd, CONFIGURATION_REG) < 0)
+	{
+		return -1;
+	}
+
 	data = read_i2c16(fd);
-	close_i2c(fd);
+	if(data == NULL)
+	{
+		return -1;
+	}
+
+	if(close_i2c(fd) < 0)
+	{
+		return -1;
+	}
 
 	configuration_reg_data = ((*data << 8) | *(data + 1));
 
