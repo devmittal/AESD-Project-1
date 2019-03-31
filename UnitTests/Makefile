@@ -44,4 +44,4 @@ message.o:	message.c message.h temperature.h lightSensor.h
 		$(CC) -c ../src/message.c -lrt
 
 clean:
-	rm unittest *.o
+	rm -f unittest *.o
