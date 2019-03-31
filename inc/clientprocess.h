@@ -20,7 +20,7 @@
 
 #define	PORT	(8800)
 
-int new_socket_FD;
+int socket_FD;
 
 int init_socket(void);
 int send_data(mesg_t *message);

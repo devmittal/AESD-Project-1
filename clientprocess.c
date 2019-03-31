@@ -8,11 +8,10 @@
 ​ * ​ ​ @version​ ​ 		1.0
 *****************************************************************************/
 
-#include "../inc/clientprocess.h"
+#include "inc/clientprocess.h"
 
 int init_socket(void)
 {
-	int socket_FD = 0;
 	struct sockaddr_in address;
 	struct sockaddr_in serv_addr;
 
@@ -54,7 +53,7 @@ int send_data(mesg_t *message)
 
 int read_data(mesg_t *message)
 {
-	if(read( new_socket_FD, message, sizeof(mesg_t)) < 0)
+	if(read(socket_FD, message, sizeof(mesg_t)) < 0)
 	{
 		perror("Error in read data ");
 		return -1;

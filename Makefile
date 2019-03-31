@@ -3,6 +3,7 @@ vpath %.h inc
 
 PLATFORM=BBG
 TARGET=proj
+TARGET_CLIENT=clientprocess 
 
 ifeq ($(PLATFORM),BBG)
 	ifeq ($(SOURCE),DEV)
@@ -18,7 +19,16 @@ endif
 OBJ_DEPS = main.o i2c.o temperature.o lightSensor.o message.o logger.o remoteTask.o led.o
 LIB_DEPS = i2c.h temperature.h lightSensor.h message.h logger.h remoteTask.h led.h
 
-all:		$(OBJ_DEPS)
+client: clientprocess.o message.o
+		$(CC) -o $(TARGET_CLIENT) clientprocess.o message.o -lrt 
+
+ifeq ($(PLATFORM),BBG)
+	scp $(TARGET_CLIENT) root@10.0.0.219:/usr/bin
+else
+	./$(TARGET_CLIENT)
+endif
+
+proj:		$(OBJ_DEPS)
 		$(CC) -o $(TARGET) $(OBJ_DEPS) -pthread -lrt -lm
 		@echo
 		@echo "							*************************************"
@@ -54,7 +64,10 @@ remoteTask.o:	remoteTask.c remoteTask.h
 			$(CC) -c src/remoteTask.c 
 
 led.o:	led.c led.h
-		$(CC) -c src/led.c 
+		$(CC) -c src/led.c
+
+clientprocess.o: clientprocess.c clientprocess.h message.h
+				$(CC) -c clientprocess.c -lrt 
 	
 clean:
 		rm -f *.o
