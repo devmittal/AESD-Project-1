@@ -13,7 +13,7 @@
 void init_MessageQueues(void)
 {
 	main_queue_fd = open_MessageQueue(MAIN_QNAME, MAIN_QSIZE);
-	queue_fd = open_MessageQueue(LOGGR_QNAME, LOGGR_QSIZE);
+	logger_queue_fd = open_MessageQueue(LOGGR_QNAME, LOGGR_QSIZE);
 }
 
 mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize)
@@ -29,13 +29,13 @@ mqd_t open_MessageQueue(char *QueueName, uint8_t QueueSize)
 	return fd;
 }
 
-void send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* message)
+void send_Message(char *QueueName, uint8_t priority, mesg_t* message)
 {
 	int value = 0;
 
 	if(strcmp(QueueName, LOGGR_QNAME) == 0)
 	{
-		value = mq_send(queue_fd, (char *)message, sizeof(mesg_t), priority);
+		value = mq_send(logger_queue_fd, (char *)message, sizeof(mesg_t), priority);
 		if(value == -1)
 		{
 			perror("Failed to send message through logger message queue ");
@@ -58,14 +58,14 @@ void send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* 
 	}
 }
 
-void recv_Message(char *QueueName, uint8_t QueueSize, uint8_t *priority, mesg_t* message)
+void recv_Message(char *QueueName, uint8_t *priority, mesg_t* message)
 {
 	int value = 0;
 	unsigned int prio;
 
 	if(strcmp(QueueName, LOGGR_QNAME) == 0)
 	{
-		value = mq_receive(queue_fd, (char *)message, sizeof(mesg_t), &prio);
+		value = mq_receive(logger_queue_fd, (char *)message, sizeof(mesg_t), &prio);
 		if(value == -1)
 		{
 				perror("Failed to receive message through logger message queue ");
@@ -75,7 +75,7 @@ void recv_Message(char *QueueName, uint8_t QueueSize, uint8_t *priority, mesg_t*
 	}
 	else if(strcmp(QueueName, MAIN_QNAME) == 0)
 	{
-		value = mq_receive(queue_fd, (char *)message, sizeof(mesg_t), &prio);
+		value = mq_receive(logger_queue_fd, (char *)message, sizeof(mesg_t), &prio);
 		if(value == -1)
 		{
 				perror("Failed to receive message through main message queue ");
@@ -99,5 +99,5 @@ void CloseUnlinkQueue(mqd_t fd, char* QueueName)
 void dest_MessageQueues(void)
 {
 	CloseUnlinkQueue(main_queue_fd, MAIN_QNAME);
-	CloseUnlinkQueue(queue_fd, LOGGR_QNAME);
+	CloseUnlinkQueue(logger_queue_fd, LOGGR_QNAME);
 }

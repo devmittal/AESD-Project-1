@@ -44,12 +44,7 @@ int write_log(int IsFileCreated, char * LogFilePath)
 		}
 		printf("PID = %d opened file in Append mode\n", getpid());
 
-		value = recv_Message(LOGGR_QNAME, LOGGR_QSIZE,  &queue_priority, &message);
-		if(value == -1)
-		{
-			perror("Logger Failed to receive message through message queue :");
-			return -1;
-		}
+		recv_Message(LOGGR_QNAME, &queue_priority, &message);	
 
 		gettimeofday(&Now,NULL);
 		fprintf(log_file_ptr, "[%lu.%06lu] %s \n", Now.tv_sec,Now.tv_usec, message.str);

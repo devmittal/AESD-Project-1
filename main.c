@@ -46,14 +46,14 @@ void getSensorData(union sigval sv)
 		if(message.light.isChange)
 		{
 			sprintf(message.str,"Change in light state read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
-			send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_LIGHT , &message);		
+			send_Message(LOGGR_QNAME, PRIO_LIGHT , &message);		
 		}
 	}
 	else
 	{
 		message.temperature = read_temperature();
 		sprintf(message.str,"Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
-		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_TEMPERATURE, &message);
+		send_Message(LOGGR_QNAME, PRIO_TEMPERATURE, &message);
 		printf("\nTemperature = %f\n",read_temperature().celcius);
 	}
 }
@@ -114,7 +114,7 @@ void temperature(void *tempeature_thread)
 	if(read_configuration_reg() == 0x60A0)
 	{
 		sprintf(message.str,"Temperature sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
-		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_NODATA, &message);
+		send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 	}
 	else
 	{
@@ -144,7 +144,7 @@ void light(void *light_thread)
 	if(startup_test() == 0x50)
 	{
 		sprintf(message.str,"Light sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
-		send_Message(LOGGR_QNAME, LOGGR_QSIZE, PRIO_NODATA, &message);		
+		send_Message(LOGGR_QNAME, PRIO_NODATA, &message);		
 	}
 	else
 	{
