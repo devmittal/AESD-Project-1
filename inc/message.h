@@ -44,6 +44,7 @@ typedef struct Message
 
 mqd_t logger_queue_fd;
 mqd_t main_queue_fd;
+int isKillSignal;
 
 /* 3rd element is included to send only message without any data */
 enum Message_Priority{PRIO_TEMPERATURE, PRIO_LIGHT, PRIO_LOG, PRIO_NODATA};

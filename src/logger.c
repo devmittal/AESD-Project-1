@@ -30,7 +30,7 @@ int write_log(int IsFileCreated, char * LogFilePath)
 		printf("PID = %d opened file in Write mode\n", getpid());
 
 		gettimeofday(&Now,NULL);
-		fprintf(log_file_ptr, "[%lu.%06lu] Logfile Created by Logger Thread. Startup Test successful (Thread ID  = %lu). \n"
+		fprintf(log_file_ptr, "[%lu.%06lu] INFO : Logfile Created by Logger Thread. Startup Test successful (Thread ID  = %lu). \n"
 				, Now.tv_sec,Now.tv_usec,syscall(__NR_gettid));	
 	}
 	else

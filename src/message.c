@@ -12,6 +12,7 @@
 
 void init_MessageQueues(void)
 {
+	isKillSignal = 0;
 	main_queue_fd = open_MessageQueue(MAIN_QNAME, MAIN_QSIZE);
 	logger_queue_fd = open_MessageQueue(LOGGR_QNAME, LOGGR_QSIZE);
 }
@@ -78,8 +79,10 @@ int recv_Message(char *QueueName, uint8_t *priority, mesg_t* message)
 		value = mq_receive(main_queue_fd, (char *)message, sizeof(mesg_t), &prio);
 		if(value == -1)
 		{
+			if(!isKillSignal)
 				perror("Failed to receive message through main message queue ");
-				return value;	
+			
+			return value;	
 		}
 		*priority = prio;
 	}

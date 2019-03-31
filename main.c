@@ -35,6 +35,7 @@ void kill_signal_handler(int signum)
 	{
 		isKill = 1;
 		fclose(log_file_ptr);
+		isKillSignal = 1;
 		pthread_cancel(thread[2]);
 	}
 }
@@ -55,7 +56,7 @@ void getSensorData(union sigval sv)
 		{
 			if(message.light.isChange)
 			{
-				sprintf(message.str,"Change in light state read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
+				sprintf(message.str,"INFO : Change in light state read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
 				send_Message(LOGGR_QNAME, PRIO_LIGHT , &message);		
 			}
 
@@ -71,7 +72,7 @@ void getSensorData(union sigval sv)
 		}
 		else
 		{
-			sprintf(message.str,"Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
+			sprintf(message.str,"INFO : Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
 			send_Message(LOGGR_QNAME, PRIO_TEMPERATURE, &message);
 			send_Message(MAIN_QNAME, PRIO_TEMPERATURE, &message);
 			printf("\nTemperature = %f\n",read_temperature().celcius);
@@ -142,7 +143,7 @@ void temperature(void *tempeature_thread)
 	/* startup test */
 	if(read_configuration_reg() == 0x60A0)
 	{
-		sprintf(message.str,"Temperature sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
+		sprintf(message.str,"INFO : Temperature sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
 		send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 	}
 	else
@@ -175,7 +176,7 @@ void light(void *light_thread)
 
 	if(startup_test() == 0x50)
 	{
-		sprintf(message.str,"Light sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
+		sprintf(message.str,"INFO : Light sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
 		send_Message(LOGGR_QNAME, PRIO_NODATA, &message);		
 	}
 	else
@@ -245,13 +246,13 @@ void check_heartbeat(void)
 			if(heartbeatmessage.light.IsError)
 			{
 				led(ON);
-				sprintf(message.str,"Heart Beat Error : Error encountered in Light Thread");
+				sprintf(message.str,"Heart Beat ERROR : Error encountered in Light Thread");
 				send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 
 				light_recoverytimeout++;
 				if(light_recoverytimeout >= RECOVERY_DEADLINE)
 				{
-					sprintf(message.str,"Heart Beat Alert : Light Thread cannot be recovered, Killing thread :(");
+					sprintf(message.str,"Heart Beat ALERT : Light Thread cannot be recovered, Killing thread :(");
 					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);					
 					IsLightHeartAttack = 1;
 				}
@@ -263,7 +264,7 @@ void check_heartbeat(void)
 				{
 					lighttimetracker = 0;
 					led(OFF);
-					sprintf(message.str,"Heart Beat Info : Light Thread working fine");
+					sprintf(message.str,"Heart Beat INFO : Light Thread working fine");
 					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 				}
 			}
@@ -274,13 +275,13 @@ void check_heartbeat(void)
 			if(heartbeatmessage.temperature.IsError)
 			{
 				led(ON);
-				sprintf(message.str,"Heart Beat Error : Error encountered in Temperature Thread");
+				sprintf(message.str,"Heart Beat ERROR : Error encountered in Temperature Thread");
 				send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 
 				tempt_recoverytimeout++;
 				if(tempt_recoverytimeout >= RECOVERY_DEADLINE)
 				{
-					sprintf(message.str,"Heart Beat Alert : Temperature Thread cannot be recovered, Killing thread :(");
+					sprintf(message.str,"Heart Beat ALERT : Temperature Thread cannot be recovered, Killing thread :(");
 					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);					
 					IsTemptHeartAttack = 1;
 				}
@@ -292,7 +293,7 @@ void check_heartbeat(void)
 				{
 					tempttimetracker = 0;
 					led(OFF);
-					sprintf(message.str,"Heart Beat Info : Temperature Thread working fine");
+					sprintf(message.str,"Heart Beat INFO : Temperature Thread working fine");
 					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 				}
 			}
@@ -303,7 +304,7 @@ void check_heartbeat(void)
 			if(heartbeatmessage.IsLoggerError < 0)
 			{
 				led(ON);
-				printf("\nHeart Beat Alert : Error Encountered in Logger Thread, Killing Program NOoooo :(\n");
+				printf("\nHeart Beat ALERT : Error Encountered in Logger Thread, Killing Program NOoooo :(\n");
 				pthread_cancel(thread[2]);
 				isKill = 1;
 				break;
