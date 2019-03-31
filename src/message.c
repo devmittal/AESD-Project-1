@@ -47,8 +47,8 @@ void send_Message(char *QueueName, uint8_t QueueSize, uint8_t priority, mesg_t* 
 		value = mq_send(main_queue_fd, (char *)message, sizeof(mesg_t), priority);	
 		if(value == -1)
 		{
-				perror("Failed to send message through main message queue ");
-				exit(-1);	
+			perror("Failed to send message through main message queue ");
+			exit(-1);	
 		}
 	}
 	else
