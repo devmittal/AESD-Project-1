@@ -73,17 +73,6 @@ int power_up(void)
 		return -1;
 	}
 
-	if(control_register_data == 0x33)
-	{
-		printf("\nLight Sensor powered up");
-		/* print to log file */
-	}
-	else
-	{
-		printf("\nLight sensor not powered up! x_x");
-		/* print to log file. Handle case??? */
-	}
-
 	return control_register_data;
 }
 
@@ -165,11 +154,9 @@ void set_interrupt_threshold(uint16_t thresh_low, uint16_t thresh_high)
 
 	fd = init_i2c(APDS_9301_DEV_ID);
 	
-	write_i2c(fd, CMD_INTERRUPT_THRESHOLD_REGISTER_LOW);
-	write_i2c16(fd, thresh_low);
+	write_i2c16(fd, thresh_low, CMD_INTERRUPT_THRESHOLD_REGISTER_LOW);
 
-	write_i2c(fd, CMD_INTERRUPT_THRESHOLD_REGISTER_HIGH);
-	write_i2c16(fd, thresh_high);
+	write_i2c16(fd, thresh_high,CMD_INTERRUPT_THRESHOLD_REGISTER_HIGH);
 
 	close_i2c(fd);
 }
@@ -287,7 +274,6 @@ double cal_lumen(int ch0, int ch1)
 {
 	double div_result, lux;
 
-	printf("\nch0: %d | ch1: %d",ch0,ch1);
 	div_result = (double)ch1/(double)ch0;
 
 	if(div_result > 0 && div_result <= 0.50)
@@ -317,7 +303,6 @@ uint8_t change(uint8_t isLight)
 	static int isFirstIteration = 1;
 
 	printf("\nLight State: %d",isLight);
-	printf("\nPrevious State: %d\n\n",previous_state);
 
 	if(isFirstIteration)
 	{

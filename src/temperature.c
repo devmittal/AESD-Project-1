@@ -153,7 +153,6 @@ void set_shutdown(void)
 	configuration_reg_data = read_configuration_reg();
 
 	configuration_reg_data = (configuration_reg_data | (0x0100));
-	printf("\nConfig: %X | %X",((uint8_t)(configuration_reg_data>>8)),((uint8_t)(configuration_reg_data)));
 
 	fd = init_i2c(TMP102_DEV_ID);
 	write_i2c16_config(fd,configuration_reg_data);
@@ -168,7 +167,6 @@ void disable_shutdown(void)
 	configuration_reg_data = read_configuration_reg();
 
 	configuration_reg_data = (configuration_reg_data & ~(0x0100));
-	printf("\nConfig: %X | %X",((uint8_t)(configuration_reg_data>>8)),((uint8_t)(configuration_reg_data)));
 
 	fd = init_i2c(TMP102_DEV_ID);
 	write_i2c16_config(fd,configuration_reg_data);
@@ -197,8 +195,6 @@ void write_fault(uint8_t fault)
 	configuration_reg_data &= ~(0x1800); 
 	configuration_reg_data |= (fault<<11);
 
-	printf("\nConfig: %X | %X",((uint8_t)(configuration_reg_data>>8)),((uint8_t)(configuration_reg_data)));
-
 	fd = init_i2c(TMP102_DEV_ID);
 	write_i2c16_config(fd,configuration_reg_data);
 	close_i2c(fd);
@@ -226,8 +222,6 @@ void write_em(uint8_t em)
 	configuration_reg_data &= ~(0x0010); 
 	configuration_reg_data |= (em<<4);
 
-	printf("\nConfig: %X | %X",((uint8_t)(configuration_reg_data>>8)),((uint8_t)(configuration_reg_data)));
-
 	fd = init_i2c(TMP102_DEV_ID);
 	write_i2c16_config(fd,configuration_reg_data);
 	close_i2c(fd);
@@ -254,8 +248,6 @@ void set_conversion_rate(uint8_t cr)
 
 	configuration_reg_data &= ~(0x00C0); 
 	configuration_reg_data |= (cr<<6);
-
-	printf("\nConfig: %X | %X",((uint8_t)(configuration_reg_data>>8)),((uint8_t)(configuration_reg_data)));
 
 	fd = init_i2c(TMP102_DEV_ID);
 	write_i2c16_config(fd,configuration_reg_data);	

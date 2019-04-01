@@ -56,11 +56,16 @@ int write_i2c(int fd, uint8_t register_type)
 	return value;
 }
 
-int write_i2c16(int fd, uint16_t register_type)
+int write_i2c16(int fd, uint16_t register_type, uint8_t command_register_addr)
 {
 	int value = 0;
+	uint8_t data[3];
 
-	value = write(fd, &register_type, sizeof(register_type));
+	data[0] = command_register_addr;
+	data[1] = (uint8_t)(register_type);
+	data[2] = (uint8_t)(register_type>>8);
+
+	value = write(fd, &data, sizeof(data));
 	if (value < 0)
 	{
 		perror("Error encountered in I2C write - 16");
