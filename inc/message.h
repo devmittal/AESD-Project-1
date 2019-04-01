@@ -42,6 +42,7 @@ typedef struct Message
 	int IsLoggerError;
 	int IsRemoteError;
 	char str[100];
+	char loglevel[20];
 }mesg_t;
 
 mqd_t logger_queue_fd;

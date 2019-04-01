@@ -50,7 +50,7 @@ int write_log(int IsFileCreated, char * LogFilePath)
 		}
 
 		gettimeofday(&Now,NULL);
-		fprintf(log_file_ptr, "[%lu.%06lu] %s \n", Now.tv_sec,Now.tv_usec, message.str);
+		fprintf(log_file_ptr, "[%lu.%06lu] %s : %s \n", Now.tv_sec,Now.tv_usec, message.loglevel, message.str);
 
 		if(queue_priority == PRIO_TEMPERATURE)
 		{

@@ -106,10 +106,7 @@ int main(void)
 	
 			switch(item)
 			{
-				case 1:	if(message.temperature.celcius)
-							printf("Temperature in Celsuis = %f\n", message.temperature.celcius);
-						else
-							printf("Unfotunately this is still fucked\n");
+				case 1:	printf("Temperature in Celsuis = %f\n", message.temperature.celcius);
 						break;
 
 				case 2:	printf("Temperature in Farenheit = %f\n", message.temperature.farenheit);
@@ -153,7 +150,7 @@ int main(void)
 				case 2:	printf("Lux IR Light = %d\n", message.light.lux_irlight);
 						break;
 
-				case 3:	printf("Luminosity = %d\n", message.light.lumen);
+				case 3:	printf("Luminosity = %f\n", message.light.lumen);
 						break;
 
 				case 4:	if(message.light.isLight)

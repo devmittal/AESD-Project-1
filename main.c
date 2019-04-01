@@ -62,7 +62,8 @@ void getSensorData(union sigval sv)
 		{
 			if(message.light.isChange)
 			{
-				sprintf(message.str,"INFO : Change in light state read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
+				sprintf(message.loglevel,"INFO");
+				sprintf(message.str,"Change in light state read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
 				send_Message(LOGGR_QNAME, PRIO_LIGHT , &message);		
 			}
 			if(isLightRequested)
@@ -83,7 +84,8 @@ void getSensorData(union sigval sv)
 		}
 		else
 		{
-			sprintf(message.str,"INFO : Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
+			sprintf(message.loglevel,"INFO");
+			sprintf(message.str,"Temperature data read by Temperature Thread (Thread ID = %lu)",syscall(__NR_gettid));
 			send_Message(LOGGR_QNAME, PRIO_TEMPERATURE, &message);
 			send_Message(MAIN_QNAME, PRIO_TEMPERATURE, &message);
 			if(isTemperatureRequested)
@@ -159,7 +161,8 @@ void temperature(void *tempeature_thread)
 	/* startup test */
 	if(read_configuration_reg() == 0x60A0)
 	{
-		sprintf(message.str,"INFO : Temperature sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
+		sprintf(message.loglevel,"INFO");
+		sprintf(message.str,"Temperature sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
 		send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 	}
 	else
@@ -192,7 +195,8 @@ void light(void *light_thread)
 
 	if(startup_test() == 0x50)
 	{
-		sprintf(message.str,"INFO : Light sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
+		sprintf(message.loglevel,"INFO");
+		sprintf(message.str,"Light sensor I2C working. Startup test successful. (Thread ID = %lu)",syscall(__NR_gettid));
 		send_Message(LOGGR_QNAME, PRIO_NODATA, &message);		
 	}
 	else
@@ -266,7 +270,8 @@ void remote(void *remote_thread)
 		{		
 			if(strcmp(clientmessage.str, "temperature") == 0)
 			{
-				sprintf(logmessage.str,"INFO : Remote task is requesting temperature data (Thread ID = %lu)",syscall(__NR_gettid));
+				sprintf(logmessage.loglevel,"INFO");
+				sprintf(logmessage.str,"Remote task is requesting temperature data (Thread ID = %lu)",syscall(__NR_gettid));
 				send_Message(LOGGR_QNAME, PRIO_NODATA, &logmessage);
 
 				mainmessage.IsRemoteError = 0;
@@ -290,7 +295,8 @@ void remote(void *remote_thread)
 			}
 			else
 			{
-				sprintf(logmessage.str,"INFO : Remote task is requesting light data (Thread ID = %lu)",syscall(__NR_gettid));
+				sprintf(logmessage.loglevel,"INFO");
+				sprintf(logmessage.str,"Remote task is requesting light data (Thread ID = %lu)",syscall(__NR_gettid));
 				send_Message(LOGGR_QNAME, PRIO_NODATA, &logmessage);
 
 				mainmessage.IsRemoteError = 0;
@@ -342,13 +348,15 @@ void check_heartbeat(void)
 			if(heartbeatmessage.light.IsError)
 			{
 				led(ON);
-				sprintf(message.str,"Heart Beat ERROR : Error encountered in Light Thread");
+				sprintf(message.loglevel,"Heart Beat ERROR");
+				sprintf(message.str,"Error encountered in Light Thread");
 				send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 
 				light_recoverytimeout++;
 				if(light_recoverytimeout >= RECOVERY_DEADLINE)
 				{
-					sprintf(message.str,"Heart Beat ALERT : Light Thread cannot be recovered, Killing thread :(");
+					sprintf(message.loglevel,"Heart Beat ALERT");
+					sprintf(message.str,"Light Thread cannot be recovered, Killing thread :(");
 					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);					
 					IsLightHeartAttack = 1;
 				}
@@ -360,7 +368,8 @@ void check_heartbeat(void)
 				{
 					lighttimetracker = 0;
 					led(OFF);
-					sprintf(message.str,"Heart Beat INFO : Light Thread working fine");
+					sprintf(message.loglevel,"Heart Beat INFO");
+					sprintf(message.str,"Light Thread working fine");
 					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 				}
 			}
@@ -371,13 +380,15 @@ void check_heartbeat(void)
 			if(heartbeatmessage.temperature.IsError)
 			{
 				led(ON);
-				sprintf(message.str,"Heart Beat ERROR : Error encountered in Temperature Thread");
+				sprintf(message.loglevel,"Heart Beat ERROR");
+				sprintf(message.str,"Error encountered in Temperature Thread");
 				send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 
 				tempt_recoverytimeout++;
 				if(tempt_recoverytimeout >= RECOVERY_DEADLINE)
 				{
-					sprintf(message.str,"Heart Beat ALERT : Temperature Thread cannot be recovered, Killing thread :(");
+					sprintf(message.loglevel,"Heart Beat ALERT");
+					sprintf(message.str,"Temperature Thread cannot be recovered, Killing thread :(");
 					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);					
 					IsTemptHeartAttack = 1;
 				}
@@ -412,13 +423,15 @@ void check_heartbeat(void)
 			if(heartbeatmessage.IsRemoteError == 1)
 			{
 				led(ON);
-				sprintf(message.str,"Heart Beat ERROR : Error encountered in Remote Thread");
+				sprintf(message.loglevel,"Heart Beat ERROR");
+				sprintf(message.str,"Error encountered in Remote Thread");
 				send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 
 				remote_recoverytimeout++;
 				if(remote_recoverytimeout >= RECOVERY_DEADLINE)
 				{
-					sprintf(message.str,"Heart Beat ALERT : Remote Thread cannot be recovered, Killing thread :(");
+					sprintf(message.loglevel,"Heart Beat ALERT");
+					sprintf(message.str,"Remote Thread cannot be recovered, Killing thread :(");
 					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);					
 					pthread_cancel(thread[3]);
 				}
@@ -430,7 +443,8 @@ void check_heartbeat(void)
 				{
 					remotetimetracker = 0;
 					led(OFF);
-					sprintf(message.str,"Heart Beat INFO : Remote Thread working fine");
+					sprintf(message.loglevel,"Heart Beat INFO");
+					sprintf(message.str,"Remote Thread working fine");
 					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 				}
 			}
