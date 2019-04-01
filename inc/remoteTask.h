@@ -1,6 +1,6 @@
 /*****************************************************************************
- *   @file        remoteTask.h
- *   @brief       Contains dependencies pertaining to remoteTask.c
+ *   @File        remoteTask.h
+ *   @Brief       Contains dependencies pertaining to remoteTask.c
  *   @Comm Type   I2C
  *   @Tools_Used  Compiler: ARM-LINUX-GCC; Board: BeagleBone Green
  *   @Author(s)   Souvik De, Devansh Mittal
