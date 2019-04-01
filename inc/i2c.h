@@ -25,19 +25,49 @@
 #define APDS_9301_DEV_ID	(0x39) //Light sensor address
 #define CONFIG_REG_TEMP 	(0x01)
 
-sem_t i2c_bus_lock; /*Initialized and Destroyed in Main*/
-int I2C_FileDescriptor;
+sem_t i2c_bus_lock; 		/* Semaphore Variable - Initialized and Destroyed in Main*/
+int I2C_FileDescriptor;		/* I2C File Descriptor */
 
 /**
-* @Brief  This function initializes i2c communication
+* @Brief  This function initializes the I2C bus
 * @Param  DeviceID: Sensor address
-* @Return 
+* @Return Error code
 **/
 int init_i2c(uint8_t DeviceID);
+
+/**
+* @Brief  This function writes 8-bit data to the I2C Bus
+* @Param  (1) I2C file descriptor; (2) Registor address to be written to.
+* @Return Error code
+**/
 int write_i2c(int fd, uint8_t register_type);
+
+/**
+* @Brief  This function writes 16-bit data to the I2C Bus
+* @Param  (1) I2C file descriptor; (2) Registor address to be written to.
+* @Return Error code
+**/
 int write_i2c16(int fd, uint16_t register_type);
+
+/**
+* @Brief  This function reads 16-bit data from the I2C Bus
+* @Param  I2C file descriptor
+* @Return Address of the variable that holds the 16-bit value
+**/
 uint8_t* read_i2c16(int fd);
+
+/**
+* @Brief  This function reads 8-bit data from the I2C Bus
+* @Param  I2C file descriptor
+* @Return Data to be returned / Error Code in case of failure
+**/
 int read_i2c8(int fd);
+
+/**
+* @Brief  This function concludes the I2C Communication.
+* @Param  I2C file descriptor
+* @Return Error code
+**/
 int close_i2c(int fd);
 int write_i2c16_config(int fd, uint16_t register_type);
 

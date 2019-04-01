@@ -89,8 +89,8 @@ int recv_Message(char *QueueName, uint8_t *priority, mesg_t* message)
 		value = mq_receive(logger_queue_fd, (char *)message, sizeof(mesg_t), &prio);
 		if(value == -1)
 		{
-				perror("Failed to receive message through logger message queue ");
-				return value;	
+			perror("Failed to receive message through logger message queue ");
+			return value;	
 		}
 		*priority = prio;
 	}
