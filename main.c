@@ -14,23 +14,29 @@
 #include "inc/remoteTask.h"
 #include "inc/temperature.h"
 
-#define NUM_THREADS (4)
-#define RECOVERY_DEADLINE (15)
+#define NUM_THREADS (4)				//Number of threads in the process
+#define RECOVERY_DEADLINE (15)		//Recovery deadline for threads to recover from failure
 
-uint8_t isKill = 0;
-uint8_t IsTemptHeartAttack = 0;
-uint8_t IsLightHeartAttack = 0;
-uint8_t isTemperatureRequested = 0;
-uint8_t isLightRequested = 0;
+uint8_t isKill = 0;					//Denotes a kill signal being detected
+uint8_t IsTemptHeartAttack = 0;		//Denotes temperature thread failure beyound recover
+uint8_t IsLightHeartAttack = 0;		//Denotes light thread failure beyound recover
+uint8_t isTemperatureRequested = 0;	//Denotes if temperature data is being requested by remote thread
+uint8_t isLightRequested = 0;		//Denotes if light data is being requested by remote thread
 
-pthread_t thread[NUM_THREADS];
+pthread_t thread[NUM_THREADS];		//Global declaration of Thread array 
 
+/* Thread structure containing identification data and log file path */
 typedef struct my_thread
 {
 	int id;
 	char* log;
 }thread_t;
 
+/**
+* @Brief  Signal handler for signal SIGINT aka Ctrl-C
+* @Param  Signal Number (Macro)
+* @Return void
+**/
 void kill_signal_handler(int signum)
 {
 	int i;
@@ -46,6 +52,11 @@ void kill_signal_handler(int signum)
 	}
 }
 
+/**
+* @Brief  Common call back function for temperature and light timer
+* @Param  Identification data for each task germane to the timer
+* @Return void
+**/
 void getSensorData(union sigval sv)
 {
 	mesg_t message;
@@ -96,13 +107,13 @@ void getSensorData(union sigval sv)
 			printf("\nTemperature = %f\n",read_temperature().celcius);
 		}
 	}
-	else
-	{
-		/* For Remote Task */
-	}
 }
 
-
+/**
+* @Brief  This function initializes a unique timer on demand for every requesting thread
+* @Param  (1) Requesting Source; (2) Interval time; (3) Callback function address
+* @Return Unique timer variable
+**/
 timer_t timer_init(int source, uint8_t interval, void *callback)
 {
 	struct sigevent sev;
@@ -137,6 +148,11 @@ timer_t timer_init(int source, uint8_t interval, void *callback)
 	return timerid;
 }
 
+/**
+* @Brief  Temperature thread callback function
+* @Param  Temperature thread structure for identification
+* @Return void
+**/
 void temperature(void *tempeature_thread)
 {
 	mesg_t message;
@@ -172,6 +188,12 @@ void temperature(void *tempeature_thread)
 	}
 }
 
+
+/**
+* @Brief  Light thread callback function
+* @Param  Light thread structure for identification
+* @Return void
+**/
 void light(void *light_thread)
 {
 	mesg_t message;
@@ -212,6 +234,11 @@ void light(void *light_thread)
 	}
 }
 
+/**
+* @Brief  Logger thread callback function
+* @Param  Logger thread structure for identification
+* @Return void
+**/
 void logger(void *logger_thread)
 {
 	thread_t *logger = (thread_t*) logger_thread;
@@ -228,6 +255,11 @@ void logger(void *logger_thread)
 
 }
 
+/**
+* @Brief  Remote task thread callback function
+* @Param  Remote task thread structure for identification
+* @Return void
+**/
 void remote(void *remote_thread)
 {
 	mesg_t mainmessage;
@@ -308,6 +340,12 @@ void remote(void *remote_thread)
 	}
 }
 
+/**
+* @Brief  This function registers heart beats from different threads and sends
+*		  relevant data to the logger.
+* @Param  void
+* @Return void
+**/
 void check_heartbeat(void)
 {
 	uint8_t queue_priority;
@@ -441,6 +479,12 @@ void check_heartbeat(void)
 	}
 }
 
+/**
+* @Brief  This function initialize a signal handler to kill any particular thread or
+*         the process itself.
+* @Param  void
+* @Return void
+**/
 void setup_signalhandler(void)
 {
 	struct sigaction act;
@@ -455,6 +499,7 @@ void setup_signalhandler(void)
 	}
 }
 
+/************************ Main ************************/
 int main(int argc, char *argv[])
 {
 	led(OFF);
