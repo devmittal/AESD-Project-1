@@ -21,6 +21,7 @@ uint8_t isKill = 0;
 uint8_t IsTemptHeartAttack = 0;
 uint8_t IsLightHeartAttack = 0;
 uint8_t isTemperatureRequested = 0;
+uint8_t isLightRequested = 0;
 
 pthread_t thread[NUM_THREADS];
 
@@ -36,9 +37,12 @@ void kill_signal_handler(int signum)
 	if(signum == SIGINT)
 	{
 		isKill = 1;
-		fclose(log_file_ptr);
 		isKillSignal = 1;
+		sleep(1);
+		fflush(log_file_ptr);
+		fclose(log_file_ptr);
 		pthread_cancel(thread[2]);
+		pthread_cancel(thread[3]);
 	}
 }
 
@@ -61,6 +65,11 @@ void getSensorData(union sigval sv)
 				sprintf(message.str,"INFO : Change in light state read by Light Thread (Thread ID = %lu)",syscall(__NR_gettid));
 				send_Message(LOGGR_QNAME, PRIO_LIGHT , &message);		
 			}
+			if(isLightRequested)
+			{
+				send_Message(LIGHT_QNAME, PRIO_REMOTE, &message);
+				isLightRequested = 0;
+			}
 
 			send_Message(MAIN_QNAME, PRIO_LIGHT , &message);
 		}
@@ -79,7 +88,6 @@ void getSensorData(union sigval sv)
 			send_Message(MAIN_QNAME, PRIO_TEMPERATURE, &message);
 			if(isTemperatureRequested)
 			{
-				printf("\nTemperature sent to remote task ********************************************************************************************8\n");
 				send_Message(TEMPT_QNAME, PRIO_REMOTE, &message);
 				isTemperatureRequested = 0;
 			}
@@ -235,6 +243,8 @@ void remote(void *remote_thread)
 	mesg_t mainmessage;
 	mesg_t clientmessage;
 	mesg_t temptmessage;
+	mesg_t lightmessage;
+	mesg_t logmessage;
 	uint8_t queue_priority;
 
 	mainmessage.IsRemoteError = 0;
@@ -254,10 +264,16 @@ void remote(void *remote_thread)
 		}
 		else
 		{		
-			printf("\nSocket msg received: %s\n",clientmessage.str);
 			if(strcmp(clientmessage.str, "temperature") == 0)
 			{
+				sprintf(logmessage.str,"INFO : Remote task is requesting temperature data (Thread ID = %lu)",syscall(__NR_gettid));
+				send_Message(LOGGR_QNAME, PRIO_NODATA, &logmessage);
+
+				mainmessage.IsRemoteError = 0;
+				send_Message(MAIN_QNAME, PRIO_REMOTE, &mainmessage);
+
 				isTemperatureRequested = 1;
+				
 				if(recv_Message(TEMPT_QNAME, &queue_priority, &temptmessage) < 0)
 				{
 					mainmessage.IsRemoteError = 1;
@@ -265,18 +281,39 @@ void remote(void *remote_thread)
 				} 
 				else
 				{
-					printf("\nTemperature in Celcius bitch ************************************************* = %f\n", temptmessage.temperature.celcius);
 					if(send_data(&temptmessage) < 0)
-						printf("\nError in send data");
+					{
+						mainmessage.IsRemoteError = 1;
+						send_Message(MAIN_QNAME, PRIO_REMOTE, &mainmessage);
+					}
 				}
 			}
 			else
 			{
+				sprintf(logmessage.str,"INFO : Remote task is requesting light data (Thread ID = %lu)",syscall(__NR_gettid));
+				send_Message(LOGGR_QNAME, PRIO_NODATA, &logmessage);
 
+				mainmessage.IsRemoteError = 0;
+				send_Message(MAIN_QNAME, PRIO_REMOTE, &mainmessage);
+				
+				isLightRequested = 1;
+				
+				if(recv_Message(LIGHT_QNAME, &queue_priority, &lightmessage) < 0)
+				{
+					mainmessage.IsRemoteError = 1;
+					send_Message(MAIN_QNAME, PRIO_REMOTE, &mainmessage);	
+				} 
+				else
+				{
+					if(send_data(&lightmessage) < 0)
+					{
+						mainmessage.IsRemoteError = 1;
+						send_Message(MAIN_QNAME, PRIO_REMOTE, &mainmessage);
+					}
+				}
 			}
 		}
 	}
-
 }
 
 void check_heartbeat(void)
@@ -284,8 +321,10 @@ void check_heartbeat(void)
 	uint8_t queue_priority;
 	uint32_t lighttimetracker = 0;
 	uint32_t tempttimetracker = 0;
+	uint32_t remotetimetracker = 0;
 	uint32_t light_recoverytimeout = 0;
 	uint32_t tempt_recoverytimeout = 0;
+	uint32_t remote_recoverytimeout = 0;
 	mesg_t heartbeatmessage;
 	mesg_t message;
 
@@ -363,17 +402,42 @@ void check_heartbeat(void)
 				led(ON);
 				printf("\nHeart Beat ALERT : Error Encountered in Logger Thread, Killing Program NOoooo :(\n");
 				pthread_cancel(thread[2]);
+				pthread_cancel(thread[3]);
 				isKill = 1;
 				break;
 			}
 		}
-		else
+		if(queue_priority == PRIO_REMOTE)
 		{
-			/* Check for Remote Task */
-		}
+			if(heartbeatmessage.IsRemoteError == 1)
+			{
+				led(ON);
+				sprintf(message.str,"Heart Beat ERROR : Error encountered in Remote Thread");
+				send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
 
+				remote_recoverytimeout++;
+				if(remote_recoverytimeout >= RECOVERY_DEADLINE)
+				{
+					sprintf(message.str,"Heart Beat ALERT : Remote Thread cannot be recovered, Killing thread :(");
+					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);					
+					pthread_cancel(thread[3]);
+				}
+			}
+			else
+			{
+				remote_recoverytimeout = 0;
+				if(remotetimetracker >= 2)
+				{
+					remotetimetracker = 0;
+					led(OFF);
+					sprintf(message.str,"Heart Beat INFO : Remote Thread working fine");
+					send_Message(LOGGR_QNAME, PRIO_NODATA, &message);
+				}
+			}
+		}
 		lighttimetracker++;
 		tempttimetracker++;
+		remotetimetracker++;
 	}
 }
 
