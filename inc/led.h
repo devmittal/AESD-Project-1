@@ -14,8 +14,14 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+/* Denotes if the LED is ON or OFF */
 enum LED_STATE{OFF, ON};
 
+/**
+* @Brief  This function switches the LED on and off
+* @Param  ON-1 or OFF-0
+* @Return void
+**/
 void led(uint8_t status);
 
 #endif
