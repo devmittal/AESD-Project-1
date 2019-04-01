@@ -3,7 +3,7 @@
 ​ * ​ ​ @brief​ ​ 		Contains dependencies pertaining to remoteTask.c
  *   @Comm Type 	I2C
  *   @Tools_Used 	Compiler: ARM-LINUX-GCC; Board: BeagleBone Green
-​ * ​ ​ @Author(s)​  	​​Devansh Mittal, Souvik De
+​ * ​ ​ @Author(s)​  	​​Souvik De, Devansh Mittal
 ​ * ​ ​ @Date​ ​​ 		March 30th, 2019
 ​ * ​ ​ @version​ ​ 		1.0
 *****************************************************************************/
