@@ -125,6 +125,12 @@ uint8_t read_conversion_rate(void);
 **/
 void set_conversion_rate(uint8_t cr);
 
+/**
+* @Brief  This function sets the fault bits in the configuration register of the
+* 		  temperature register
+* @Param  fault: fault value (0-3)
+* @Return void
+**/
 void write_fault(uint8_t fault);
 
 #endif

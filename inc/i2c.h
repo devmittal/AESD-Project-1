@@ -44,10 +44,11 @@ int write_i2c(int fd, uint8_t register_type);
 
 /**
 * @Brief  This function writes 16-bit data to the I2C Bus
-* @Param  (1) I2C file descriptor; (2) Registor address to be written to.
+* @Param  (1) I2C file descriptor; (2) Registor address to be written to; (3) Command register
+*		  address.
 * @Return Error code
 **/
-int write_i2c16(int fd, uint16_t register_type);
+int write_i2c16(int fd, uint16_t register_type,uint8_t command_register_addr);
 
 /**
 * @Brief  This function reads 16-bit data from the I2C Bus
@@ -69,6 +70,13 @@ int read_i2c8(int fd);
 * @Return Error code
 **/
 int close_i2c(int fd);
+
+/**
+* @Brief  This function writes 24-bit data to the I2C Bus to write to the configuration register
+* 		  of the temperature sensor.
+* @Param  (1) I2C file descriptor; (2) Registor data to be write.
+* @Return Error code
+**/
 int write_i2c16_config(int fd, uint16_t register_type);
 
 #endif
