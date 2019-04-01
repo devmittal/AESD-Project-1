@@ -125,4 +125,6 @@ uint8_t read_conversion_rate(void);
 **/
 void set_conversion_rate(uint8_t cr);
 
+void write_fault(uint8_t fault);
+
 #endif

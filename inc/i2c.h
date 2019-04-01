@@ -23,6 +23,7 @@
 
 #define TMP102_DEV_ID		(0x48) //Temperature sensor address
 #define APDS_9301_DEV_ID	(0x39) //Light sensor address
+#define CONFIG_REG_TEMP 	(0x01)
 
 sem_t i2c_bus_lock; /*Initialized and Destroyed in Main*/
 int I2C_FileDescriptor;
@@ -38,5 +39,6 @@ int write_i2c16(int fd, uint16_t register_type);
 uint8_t* read_i2c16(int fd);
 int read_i2c8(int fd);
 int close_i2c(int fd);
+int write_i2c16_config(int fd, uint16_t register_type);
 
 #endif

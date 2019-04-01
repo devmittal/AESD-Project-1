@@ -70,6 +70,25 @@ int write_i2c16(int fd, uint16_t register_type)
 	return value;
 }
 
+int write_i2c16_config(int fd, uint16_t register_type)
+{
+	int value = 0;
+	uint8_t data[3];
+
+	data[0] = CONFIG_REG_TEMP;
+	data[1] = (uint8_t)(register_type>>8);
+	data[2] = (uint8_t)(register_type);
+
+	value = write(fd, &data, sizeof(data));
+	if (value < 0)
+	{
+		perror("Error encountered in I2C write - 16 - config register");
+		sem_post(&i2c_bus_lock);
+	}
+
+	return value;
+}
+
 uint8_t* read_i2c16(int fd)
 {
 	int value = 0;

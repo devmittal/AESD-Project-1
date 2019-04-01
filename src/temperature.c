@@ -156,9 +156,7 @@ void set_shutdown(void)
 	printf("\nConfig: %X | %X",((uint8_t)(configuration_reg_data>>8)),((uint8_t)(configuration_reg_data)));
 
 	fd = init_i2c(TMP102_DEV_ID);
-	WRITE_POINTER(fd, CONFIGURATION_REG);
-	write_i2c(fd, (uint8_t)(configuration_reg_data>>8));
-	write_i2c(fd, (uint8_t)(configuration_reg_data));
+	write_i2c16_config(fd,configuration_reg_data);
 	close_i2c(fd);
 }
 
@@ -173,9 +171,7 @@ void disable_shutdown(void)
 	printf("\nConfig: %X | %X",((uint8_t)(configuration_reg_data>>8)),((uint8_t)(configuration_reg_data)));
 
 	fd = init_i2c(TMP102_DEV_ID);
-	WRITE_POINTER(fd, CONFIGURATION_REG);
-	write_i2c(fd, (uint8_t)(configuration_reg_data>>8));
-	write_i2c(fd, (uint8_t)(configuration_reg_data));
+	write_i2c16_config(fd,configuration_reg_data);
 	close_i2c(fd);
 }
 
@@ -189,6 +185,23 @@ uint8_t read_fault(void)
 	fault_bits = (uint8_t)((configuration_reg_data & (0x1800)) >> 11);
 
 	return fault_bits;
+}
+
+void write_fault(uint8_t fault)
+{
+	int fd = 0;
+	uint16_t configuration_reg_data;	
+
+	configuration_reg_data = read_configuration_reg();
+
+	configuration_reg_data &= ~(0x1800); 
+	configuration_reg_data |= (fault<<11);
+
+	printf("\nConfig: %X | %X",((uint8_t)(configuration_reg_data>>8)),((uint8_t)(configuration_reg_data)));
+
+	fd = init_i2c(TMP102_DEV_ID);
+	write_i2c16_config(fd,configuration_reg_data);
+	close_i2c(fd);
 }
 
 uint8_t read_em(void)
@@ -216,9 +229,7 @@ void write_em(uint8_t em)
 	printf("\nConfig: %X | %X",((uint8_t)(configuration_reg_data>>8)),((uint8_t)(configuration_reg_data)));
 
 	fd = init_i2c(TMP102_DEV_ID);
-	WRITE_POINTER(fd, CONFIGURATION_REG);
-	write_i2c(fd, (uint8_t)(configuration_reg_data>>8));
-	write_i2c(fd, (uint8_t)(configuration_reg_data));
+	write_i2c16_config(fd,configuration_reg_data);
 	close_i2c(fd);
 }
 
@@ -247,8 +258,6 @@ void set_conversion_rate(uint8_t cr)
 	printf("\nConfig: %X | %X",((uint8_t)(configuration_reg_data>>8)),((uint8_t)(configuration_reg_data)));
 
 	fd = init_i2c(TMP102_DEV_ID);
-	WRITE_POINTER(fd, CONFIGURATION_REG);
-	write_i2c(fd, (uint8_t)(configuration_reg_data>>8));
-	write_i2c(fd, (uint8_t)(configuration_reg_data));
+	write_i2c16_config(fd,configuration_reg_data);	
 	close_i2c(fd);
 }
