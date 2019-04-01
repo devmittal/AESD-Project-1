@@ -1,10 +1,10 @@
 /*****************************************************************************
- *  @File   		  i2c.h
+ *  @File         i2c.h
  *  @Brief        Contains function declarations pertaining to i2c.c
- *  @Tools_Used 	ARM-LINUX-GCC
- *  @Author(s)  	Souvik De, Devansh Mittal
- *	@Date			    March 24th, 2019
- *  @version 		  1.0
+ *  @Tools_Used   ARM-LINUX-GCC
+ *  @Author(s)    Souvik De, Devansh Mittal
+ *	@Date         March 24th, 2019
+ *  @version      1.0
 *****************************************************************************/
 
 #ifndef I2C_H
