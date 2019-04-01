@@ -1,11 +1,11 @@
 /*****************************************************************************
-​ ​* ​ ​ @file​ ​  		remoteTask.h
-​ * ​ ​ @brief​ ​ 		Contains dependencies pertaining to remoteTask.c
- *   @Comm Type 	I2C
- *   @Tools_Used 	Compiler: ARM-LINUX-GCC; Board: BeagleBone Green
-​ * ​ ​ @Author(s)​  	​​Souvik De, Devansh Mittal
-​ * ​ ​ @Date​ ​​ 		March 30th, 2019
-​ * ​ ​ @version​ ​ 		1.0
+ *   @file        remoteTask.h
+ *   @brief       Contains dependencies pertaining to remoteTask.c
+ *   @Comm Type   I2C
+ *   @Tools_Used  Compiler: ARM-LINUX-GCC; Board: BeagleBone Green
+ *   @Author(s)   Souvik De, Devansh Mittal
+ *   @Date        March 30th, 2019
+ *   @version     1.0
 *****************************************************************************/
 
 #include <stdio.h>
