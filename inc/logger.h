@@ -1,5 +1,5 @@
 /*****************************************************************************
- *  @file         logger.c
+ *  @file         logger.h
  *  @brief        Header file for Logger thread containing defines pertain-
  *                to logger.c.
  *  @Tools_Used   ARM-LINUX-GCC
