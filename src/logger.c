@@ -27,7 +27,7 @@ int write_log(int IsFileCreated, char * LogFilePath)
 			printf("PID = %d failed to open file in Write mode\n", getpid());
 			return -1;
 		}
-		printf("PID = %d opened file in Write mode\n", getpid());
+		printf("\nPID = %d opened file in Write mode\n", getpid());
 
 		gettimeofday(&Now,NULL);
 		fprintf(log_file_ptr, "[%lu.%06lu] INFO : Logfile Created by Logger Thread. Startup Test successful (Thread ID  = %lu). \n"
@@ -41,7 +41,7 @@ int write_log(int IsFileCreated, char * LogFilePath)
 			printf("\nPID = %d failed to open file in Append mode\n", getpid());
 			return -1;
 		}
-		printf("PID = %d opened file in Append mode\n", getpid());
+		printf("\nPID = %d opened file in Append mode\n", getpid());
 
 		if(recv_Message(LOGGR_QNAME, &queue_priority, &message) < 0)
 		{
