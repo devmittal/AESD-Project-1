@@ -1,14 +1,14 @@
 /*****************************************************************************
-​ ​* ​ ​ @file​ ​  		lightSensor.h
-​ * ​ ​ @brief​ ​ 		Contains dependencies pertaining to lightSensor.c and
- *					the light sensor APDS-9301.
- *					Note: Addresses prepended with "CMD" indicates a write to
- *					the command register
- *	 @Comm Type 	I2C
+ *   @file  		lightSensor.h
+ *   @brief 		Contains dependencies pertaining to lightSensor.c and
+ *			the light sensor APDS-9301.
+ *			Note: Addresses prepended with "CMD" indicates a write to
+ *			the command register
+ *   @Comm Type 	I2C
  *   @Tools_Used 	Compiler: ARM-LINUX-GCC; Board: BeagleBone Green
-​ * ​ ​ @Author(s)​  	​​Devansh Mittal, Souvik De
-​ * ​ ​ @Date​ ​​ 		March 24th, 2019
-​ * ​ ​ @version​ ​ 		1.0
+ *   @Author(s)  	Devansh Mittal, Souvik De
+ *   @Date 		March 24th, 2019
+ *   @version 		1.0
 *****************************************************************************/
 
 #include <math.h>
