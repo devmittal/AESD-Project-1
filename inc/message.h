@@ -1,13 +1,13 @@
 /*****************************************************************************
-​ ​* ​ ​@file​ ​  		message.h
- *	@brief			Contains dependecies pertaining to message.c, which enab-
- *					les message passing between different thread (IPC) using
- *					Message Queues.
- *	@Comm Type 		I2C
- *  @Tools_Used 	ARM-LINUX-GCC
-​ * ​ ​@Author(s)​  	​​Souvik De, Devansh Mittal
-​ * ​ ​@Date​ ​​ 			March 24th, 2019
-​ * ​ ​@version​ ​ 		1.0
+ *   @File  		message.h
+ *   @Brief		Contains dependecies pertaining to message.c, which enab-
+ *			les message passing between different thread (IPC) using
+ *			Message Queues.
+ *   @Comm Type		I2C
+ *   @Tools_Used 	ARM-LINUX-GCC
+ *   @Author(s)		Souvik De, Devansh Mittal
+ *   @Date		March 24th, 2019
+ *   @version		1.0
 *****************************************************************************/
 
 #ifndef MESSAGE_H
