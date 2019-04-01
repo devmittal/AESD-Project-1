@@ -1,12 +1,12 @@
 /*****************************************************************************
-​ ​* ​ ​ @file​ ​  		temperature.h
-​ * ​ ​ @brief​ ​ 		Contains dependencies pertaining to temperature.c and
- *					the temperature sensor TMP102.
- *	 @Comm Type 	I2C
+ *   @File		temperature.h
+ *   @Brief		Contains dependencies pertaining to temperature.c and
+ *			the temperature sensor TMP102.
+ *   @Comm Type 	I2C
  *   @Tools_Used 	ARM-LINUX-GCC
-​ * ​ ​ @Author(s)​  	​​Souvik De, Devansh Mittal
-​ * ​ ​ @Date​ ​​ 		March 16th, 2019
-​ * ​ ​ @version​ ​ 		1.0
+ *   @Author(s)		Souvik De, Devansh Mittal
+ *   @Date		March 16th, 2019
+ *   @version		1.0
 *****************************************************************************/
 
 #ifndef TEMPERATURE_H
