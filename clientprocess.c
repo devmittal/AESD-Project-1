@@ -76,14 +76,14 @@ int main(void)
 
 	while(1)
 	{
-		printf("Enter request type : ");
+		printf("\nEnter request type : ");
 		scanf("%s", request);	
 
 		if(strcmp(request, "temperature") == 0)
 		{
 			sprintf(message.str,"temperature");
 			printf("\nRequest Type : %s\n",message.str);
-			
+
 			if(send_data(&message) < 0)
 			{
 				printf("Failed to send data to server. Exiting :(\n");
@@ -102,11 +102,14 @@ int main(void)
 			printf("3) Kelvin\n\n");
 
 			printf("Option : ");
-			scanf("%d", item);
-
+			scanf("%d", &item);
+	
 			switch(item)
 			{
-				case 1:	printf("Temperature in Celsuis = %f\n", message.temperature.celcius);
+				case 1:	if(message.temperature.celcius)
+							printf("Temperature in Celsuis = %f\n", message.temperature.celcius);
+						else
+							printf("Unfotunately this is still fucked\n");
 						break;
 
 				case 2:	printf("Temperature in Farenheit = %f\n", message.temperature.farenheit);
@@ -116,7 +119,7 @@ int main(void)
 						break;
 
 				default: printf("Invalid Item Number ! Try again\n");
-			}	
+			}
 		}
 		else if(strcmp(request, "light") == 0)
 		{
@@ -140,7 +143,7 @@ int main(void)
 			printf("4) Light State\n\n");
 
 			printf("Option : ");
-			scanf("%d", item);
+			scanf("%d", &item);
 
 			switch(item)
 			{

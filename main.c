@@ -79,6 +79,7 @@ void getSensorData(union sigval sv)
 			send_Message(MAIN_QNAME, PRIO_TEMPERATURE, &message);
 			if(isTemperatureRequested)
 			{
+				printf("\nTemperature sent to remote task ********************************************************************************************8\n");
 				send_Message(TEMPT_QNAME, PRIO_REMOTE, &message);
 				isTemperatureRequested = 0;
 			}
@@ -231,38 +232,41 @@ void logger(void *logger_thread)
 
 void remote(void *remote_thread)
 {
-	mesg_t message;
+	mesg_t mainmessage;
+	mesg_t clientmessage;
+	mesg_t temptmessage;
 	uint8_t queue_priority;
 
-	message.IsRemoteError = 0;
+	mainmessage.IsRemoteError = 0;
 
 	if(init_socket() < 0)
 	{
-		message.IsRemoteError = 1;
-		send_Message(MAIN_QNAME, PRIO_REMOTE, &message);
+		mainmessage.IsRemoteError = 1;
+		send_Message(MAIN_QNAME, PRIO_REMOTE, &mainmessage);
 	}
 
 	while(1)
 	{
-		if(read_data(&message) < 0)
+		if(read_data(&clientmessage) < 0)
 		{
-			message.IsRemoteError = 1;
-			send_Message(MAIN_QNAME, PRIO_REMOTE, &message);
+			mainmessage.IsRemoteError = 1;
+			send_Message(MAIN_QNAME, PRIO_REMOTE, &mainmessage);
 		}
 		else
 		{		
-			printf("\nSocket msg received: %s\n",message.str);
-			if(strcmp(message.str, "temperature") == 0)
+			printf("\nSocket msg received: %s\n",clientmessage.str);
+			if(strcmp(clientmessage.str, "temperature") == 0)
 			{
 				isTemperatureRequested = 1;
-				if(recv_Message(TEMPT_QNAME, &queue_priority, &message) < 0)
+				if(recv_Message(TEMPT_QNAME, &queue_priority, &temptmessage) < 0)
 				{
-					message.IsRemoteError = 1;
-					send_Message(MAIN_QNAME, PRIO_REMOTE, &message);	
+					mainmessage.IsRemoteError = 1;
+					send_Message(MAIN_QNAME, PRIO_REMOTE, &mainmessage);	
 				} 
 				else
 				{
-					if(send_data(&message) < 0)
+					printf("\nTemperature in Celcius bitch ************************************************* = %f\n", temptmessage.temperature.celcius);
+					if(send_data(&temptmessage) < 0)
 						printf("\nError in send data");
 				}
 			}
