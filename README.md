@@ -241,11 +241,11 @@ file is created without any errors.
 
 Start-up Tests
 
-Light Sensor Task: The ID register is read and then checked if it correctly
+**Light Sensor Task**: The ID register is read and then checked if it correctly
 equals 0x50.
 
-Temperature Sensor Task: The configuration register is read and checked if it
-correctly equals the default value of 0x60A0.
+**Temperature Sensor Task**: The configuration register is read and checked if
+it correctly equals the default value of 0x60A0.
 
-Logger Task: The start-up test constitutes the logger thread spawning and a file
-being created.
+**Logger Task**: The start-up test constitutes the logger thread spawning and a
+file being created.
