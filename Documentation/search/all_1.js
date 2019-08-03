@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['cal_5flumen',['cal_lumen',['../light_sensor_8h.html#aca3cce8520f99e7925fad0ad37a0a929',1,'cal_lumen(int ch0, int ch1):&#160;lightSensor.c'],['../light_sensor_8c.html#aca3cce8520f99e7925fad0ad37a0a929',1,'cal_lumen(int ch0, int ch1):&#160;lightSensor.c']]],
+  ['cal_5ftemp',['cal_temp',['../temperature_8h.html#a4704f466dfbdf5c43a9d6808492856db',1,'cal_temp(int16_t temperature_hex, float *celcius, float *farenheit, float *kelvin):&#160;temperature.c'],['../temperature_8c.html#a4704f466dfbdf5c43a9d6808492856db',1,'cal_temp(int16_t temperature_hex, float *celcius, float *farenheit, float *kelvin):&#160;temperature.c']]],
+  ['celcius',['celcius',['../struct_temperature.html#a7ec803dbb35255f8cd750cd77fbc6d01',1,'Temperature']]],
+  ['change',['change',['../light_sensor_8h.html#ac27b8b5119215e553535d32842662324',1,'change(uint8_t isLight):&#160;lightSensor.c'],['../light_sensor_8c.html#ac27b8b5119215e553535d32842662324',1,'change(uint8_t isLight):&#160;lightSensor.c']]],
+  ['check_5fheartbeat',['check_heartbeat',['../main_8c.html#a895cb2f71f4ca2ca0a9c0eb1df8840dd',1,'main.c']]],
+  ['clientprocess_2ec',['clientprocess.c',['../clientprocess_8c.html',1,'']]],
+  ['clientprocess_2eh',['clientprocess.h',['../clientprocess_8h.html',1,'']]],
+  ['close_5fi2c',['close_i2c',['../i2c_8h.html#a046318257e4bb3b4d89269fec920ac50',1,'close_i2c(int fd):&#160;i2c.c'],['../i2c_8c.html#a046318257e4bb3b4d89269fec920ac50',1,'close_i2c(int fd):&#160;i2c.c']]],
+  ['closeunlinkqueue',['CloseUnlinkQueue',['../message_8h.html#a21feda8a41cd0c45567b4e54495374ba',1,'CloseUnlinkQueue(mqd_t fd, char *QueueName):&#160;message.c'],['../message_8c.html#a21feda8a41cd0c45567b4e54495374ba',1,'CloseUnlinkQueue(mqd_t fd, char *QueueName):&#160;message.c']]],
+  ['cmd_5fcontrol_5fregister',['CMD_CONTROL_REGISTER',['../light_sensor_8h.html#a80f68996c705a5be92a00976203b5e9f',1,'lightSensor.h']]],
+  ['cmd_5fdata0high_5fregister_5f8',['CMD_DATA0HIGH_REGISTER_8',['../light_sensor_8h.html#a8d6b618ff41edb6c0489e8b2163b0a6f',1,'lightSensor.h']]],
+  ['cmd_5fdata0low_5fregister_5f16',['CMD_DATA0LOW_REGISTER_16',['../light_sensor_8h.html#afc6e275e82dfaa97326fac24c8fdf185',1,'lightSensor.h']]],
+  ['cmd_5fdata0low_5fregister_5f8',['CMD_DATA0LOW_REGISTER_8',['../light_sensor_8h.html#a5d2658c6d010348cf40b47546b561d6c',1,'lightSensor.h']]],
+  ['cmd_5fdata1high_5fregister_5f8',['CMD_DATA1HIGH_REGISTER_8',['../light_sensor_8h.html#ac3c6ec0f058461c87133d417640ba0be',1,'lightSensor.h']]],
+  ['cmd_5fdata1low_5fregister_5f16',['CMD_DATA1LOW_REGISTER_16',['../light_sensor_8h.html#ab15fe343846f7d59a1af28ebd9ac9f83',1,'lightSensor.h']]],
+  ['cmd_5fdata1low_5fregister_5f8',['CMD_DATA1LOW_REGISTER_8',['../light_sensor_8h.html#a2bf76d45691a8ae7409bc485ef0d5641',1,'lightSensor.h']]],
+  ['cmd_5fid_5fregister',['CMD_ID_REGISTER',['../light_sensor_8h.html#ad960ee702080c109747956c721fc8e5e',1,'lightSensor.h']]],
+  ['cmd_5finterrupt_5fcontrol_5fregister',['CMD_INTERRUPT_CONTROL_REGISTER',['../light_sensor_8h.html#a2546da10fbb89265a00b5e8695e1c14e',1,'lightSensor.h']]],
+  ['cmd_5finterrupt_5fthreshold_5fregister_5fhigh',['CMD_INTERRUPT_THRESHOLD_REGISTER_HIGH',['../light_sensor_8h.html#a9ce9cd9027ecbae86517e40a4ef306e3',1,'lightSensor.h']]],
+  ['cmd_5finterrupt_5fthreshold_5fregister_5flow',['CMD_INTERRUPT_THRESHOLD_REGISTER_LOW',['../light_sensor_8h.html#a7db6ded0096e77b2ccea2cc75147fb97',1,'lightSensor.h']]],
+  ['cmd_5ftiming_5fregister',['CMD_TIMING_REGISTER',['../light_sensor_8h.html#a530e1467abe7544c535d766eabde353b',1,'lightSensor.h']]],
+  ['config_5freg_5ftemp',['CONFIG_REG_TEMP',['../i2c_8h.html#afc2cbd0293fc1e3ecf250885fa562bfc',1,'i2c.h']]],
+  ['configuration_5freg',['CONFIGURATION_REG',['../temperature_8h.html#a28fd3b4795a0f2da74b9eae704879b76af2848ea3564811ac1adc2c33b35f44d9',1,'temperature.h']]],
+  ['control_5fregister',['CONTROL_REGISTER',['../light_sensor_8h.html#a812173ffb8fcb61ebf6cbe4b07f020f6',1,'lightSensor.h']]]
+];
