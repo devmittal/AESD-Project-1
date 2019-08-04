@@ -3,7 +3,7 @@
 **Author -Souvik De, Devansh Mittal**
 
 **Multi-threaded BeagleBone Linux application having sensor interface, logger
-and sockets.**
+and sockets.** Project Link: https://devmittal.github.io/devamitt.github.io/index.html
 
 This project is a multi-threaded C application which interacts with a
 temperature and light sensor simultaneously and continuously logs the values in
